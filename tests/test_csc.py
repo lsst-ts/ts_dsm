@@ -33,6 +33,14 @@ class Harness:
 
 class TestDSMCSC(unittest.TestCase):
 
+    def cleanup(self, directory):
+        """Cleanup telemetry directory if tests fail.
+        """
+        if os.path.exists(directory):
+            for tfile in os.listdir(directory):
+                os.remove(os.path.join(directory, tfile))
+            os.removedirs(directory)
+
     def test_lifecycle_behavior(self):
         """Test that the DSM through the standard lifecycle.
 
@@ -46,6 +54,8 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(harness.csc.simulation_mode, 1)
                 self.assertIsNotNone(harness.csc.telemetry_directory)
                 self.assertTrue(os.path.exists(harness.csc.telemetry_directory))
+
+                self.cleanup(harness.csc.telemetry_directory)
 
         asyncio.get_event_loop().run_until_complete(doit())
 

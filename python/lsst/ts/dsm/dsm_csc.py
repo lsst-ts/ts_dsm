@@ -77,7 +77,8 @@ class DSMCSC(salobj.BaseCsc):
         """
         await super().do_standby(id_data)
 
-        await self.wait_loop(self.simulated_telemetry_task)
+        if self.simulation_mode:
+            await self.wait_loop(self.simulated_telemetry_task)
 
     async def end_standby(self, id_data):
         """End do_standby; called after state changes but before command
@@ -105,7 +106,8 @@ class DSMCSC(salobj.BaseCsc):
         id_data : `CommandIdData`
             Command ID and data
         """
-        self.simulated_telemetry_task = asyncio.ensure_future(self.simulated_telemetry_loop())
+        if self.simulation_mode:
+            self.simulated_telemetry_task = asyncio.ensure_future(self.simulated_telemetry_loop())
 
     async def implement_simulation_mode(self, simulation_mode):
         """Setup items related to simulation mode.

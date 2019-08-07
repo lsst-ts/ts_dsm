@@ -17,7 +17,7 @@ class DSMCSC(salobj.BaseCsc):
     Commandable SAL Component to interface with the LSST DSMs.
     """
 
-    def __init__(self, index, initial_state, initial_simulation_mode=0):
+    def __init__(self, index, initial_state=salobj.State.STANDBY, initial_simulation_mode=0):
         """
         Initialize DSM CSC.
 
@@ -61,7 +61,7 @@ class DSMCSC(salobj.BaseCsc):
         if os.path.exists(self.telemetry_directory):
             for tfile in os.listdir(self.telemetry_directory):
                 os.remove(os.path.join(self.telemetry_directory, tfile))
-        os.removedirs(self.telemetry_directory)
+            os.removedirs(self.telemetry_directory)
 
     async def do_standby(self, id_data):
         """Transition to from `State.DISABLED` to `State.STANDBY`.
@@ -78,6 +78,7 @@ class DSMCSC(salobj.BaseCsc):
         await super().do_standby(id_data)
 
         if self.simulation_mode:
+            self.log.info("Shutting down simulated telemetry loop.")
             await self.wait_loop(self.simulated_telemetry_task)
 
     async def end_standby(self, id_data):
@@ -92,6 +93,7 @@ class DSMCSC(salobj.BaseCsc):
             Command ID and data
         """
         if self.simulation_mode:
+            self.log.info("Cleanup simulation files.")
             self.cleanup_simulation()
 
     async def end_start(self, id_data):
@@ -106,6 +108,7 @@ class DSMCSC(salobj.BaseCsc):
         id_data : `CommandIdData`
             Command ID and data
         """
+        self.log.info("Finishing start command.")
         if self.simulation_mode:
             self.simulated_telemetry_task = asyncio.ensure_future(self.simulated_telemetry_loop())
 
@@ -158,6 +161,7 @@ class DSMCSC(salobj.BaseCsc):
             loop.cancel()
         try:
             await loop
+            self.log.info("Loop shutdown.")
         except asyncio.CancelledError:
             self.log.info('Loop cancelled...')
         except Exception as e:

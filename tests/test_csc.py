@@ -55,8 +55,7 @@ class TestDSMCSC(unittest.TestCase):
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)
                 self.assertEqual(harness.csc.simulation_mode, 1)
-                self.assertIsNotNone(harness.csc.telemetry_directory)
-                self.assertTrue(os.path.exists(harness.csc.telemetry_directory))
+                self.assertIsNone(harness.csc.telemetry_directory)
                 self.telemetry_directory = harness.csc.telemetry_directory
 
                 # Move to DISABLED state
@@ -68,9 +67,23 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(state.summaryState, salobj.State.DISABLED)
 
                 # Check that the simulated telemetry loop is running
+                self.assertIsNotNone(harness.csc.telemetry_directory)
+                self.assertTrue(os.path.exists(harness.csc.telemetry_directory))
+                self.telemetry_directory = harness.csc.telemetry_directory
                 self.assertTrue(harness.csc.simulated_telemetry_loop_running)
                 sim_files = len(list(os.listdir(harness.csc.telemetry_directory)))
                 self.assertEqual(sim_files, 2)
+
+                # Check that the telemetry loop is running
+                self.assertTrue(harness.csc.telemetry_loop_running)
+                # configuration = harness.remote.tel_configuration.get()
+                # self.assertEqual(configuration.dsmIndex, 1)
+                # self.assertEqual(configuration.uiVersionCode, '1.0.1')
+                # self.assertEqual(configuration.uiVersionConfig, '1.4.4')
+                # self.assertEqual(configuration.cameraName, 'Vimba')
+                # self.assertEqual(configuration.cameraFps, 40)
+                # self.assertEqual(configuration.dataBufferSize, 1024)
+                # self.assertEqual(configuration.dataAcquisitionTime, 25)
 
                 # Move to ENABLED state
                 id_ack = await harness.remote.cmd_enable.start(timeout=120)
@@ -83,6 +96,9 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertTrue(harness.csc.simulated_telemetry_loop_running)
                 sim_files = len(list(os.listdir(harness.csc.telemetry_directory)))
                 self.assertGreaterEqual(sim_files, 2)
+
+                # Telemetry loop should still be running
+                self.assertTrue(harness.csc.telemetry_loop_running)
 
                 await asyncio.sleep(1)
 
@@ -98,6 +114,9 @@ class TestDSMCSC(unittest.TestCase):
                 sim_files = len(list(os.listdir(harness.csc.telemetry_directory)))
                 self.assertGreater(sim_files, 2)
 
+                # Telemetry loop should still be running
+                self.assertTrue(harness.csc.telemetry_loop_running)
+
                 # Move to STANBY state
                 id_ack = await harness.remote.cmd_standby.start(timeout=120)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
@@ -107,7 +126,10 @@ class TestDSMCSC(unittest.TestCase):
 
                 # Simulation loop should no longer be running
                 self.assertFalse(harness.csc.simulated_telemetry_loop_running)
-                self.assertFalse(os.path.exists(harness.csc.telemetry_directory))
+                self.assertFalse(harness.csc.simulated_telemetry_ui_config_written)
+
+                # Telemetry loop should no longer be running
+                self.assertFalse(harness.csc.telemetry_loop_running)
 
         asyncio.get_event_loop().run_until_complete(doit())
 

@@ -1,7 +1,9 @@
+import aionotify
 import asyncio
 import logging
 import os
 import tempfile
+import yaml
 
 from lsst.ts import salobj
 
@@ -29,6 +31,7 @@ class DSMCSC(salobj.BaseCsc):
         self.telemetry_directory = None
         self.telemetry_loop_running = False
         self.telemetry_loop_task = None
+        self.telemetry_watcher = aionotify.Watcher()
         self.simulated_telemetry_ui_config_written = False
         self.simulated_telemetry_loop_running = False
         self.simulated_telemetry_task = None
@@ -40,6 +43,21 @@ class DSMCSC(salobj.BaseCsc):
 
         ch = logging.StreamHandler()
         self.log.addHandler(ch)
+
+    async def begin_exitControl(self, id_data):
+        """Begin do_exitControl; called after state changes but before command
+           acknowledged.
+
+        This method will remove the telemetry directory if in simulation mode.
+
+        Parameters
+        ----------
+        id_data : `CommandIdData`
+            Command ID and data
+        """
+        if self.simulation_mode:
+            if os.path.exists(self.telemetry_directory):
+                os.removedirs(self.telemetry_directory)
 
     async def begin_standby(self, id_data):
         """Begin do_standby; called after state changes but before command
@@ -54,6 +72,23 @@ class DSMCSC(salobj.BaseCsc):
             Command ID and data
         """
         self.simulated_telemetry_loop_running = False
+        self.telemetry_loop_running = False
+
+    async def begin_start(self, id_data):
+        """Begin do_start; called after state changes but before command
+           acknowledged.
+
+        This method will create the telemetry directory if in simulation mode
+        and the directory has not been specified previously.
+
+        Parameters
+        ----------
+        id_data : `CommandIdData`
+            Command ID and data
+        """
+        if self.simulation_mode and self.telemetry_directory is None:
+            self.telemetry_directory = tempfile.mkdtemp()
+            self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
 
     def cleanup_simulation(self):
         """Remove all generated files and directory from simulation
@@ -61,7 +96,6 @@ class DSMCSC(salobj.BaseCsc):
         if os.path.exists(self.telemetry_directory):
             for tfile in os.listdir(self.telemetry_directory):
                 os.remove(os.path.join(self.telemetry_directory, tfile))
-            os.removedirs(self.telemetry_directory)
 
     async def do_standby(self, id_data):
         """Transition to from `State.DISABLED` to `State.STANDBY`.
@@ -80,6 +114,31 @@ class DSMCSC(salobj.BaseCsc):
         if self.simulation_mode:
             self.log.info("Shutting down simulated telemetry loop.")
             await self.wait_loop(self.simulated_telemetry_task)
+            self.simulated_telemetry_ui_config_written = False
+
+        self.log.info("Shutting down telemetry loop.")
+        await self.wait_loop(self.telemetry_task)
+
+    async def do_start(self, id_data):
+        """Transition to from `State.STANDBY` to `State.DISABLED`.
+
+        After switching from standby to disable, start the telemetry watching.
+
+        Parameters
+        ----------
+        id_data : `CommandIdData`
+            Command ID and data
+        """
+        await super().do_start(id_data)
+        try:
+            self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)
+            loop = asyncio.get_running_loop()
+            await self.telemetry_watcher.setup(loop)
+        except ValueError:
+            # Watch already running
+            pass
+
+        self.telemetry_task = asyncio.ensure_future(self.telemetry_loop())
 
     async def end_standby(self, id_data):
         """End do_standby; called after state changes but before command
@@ -120,9 +179,43 @@ class DSMCSC(salobj.BaseCsc):
         simulation_mode : int
             Constant that declares simulation mode or not.
         """
-        if simulation_mode:
-            self.telemetry_directory = tempfile.mkdtemp()
-            self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
+        self.log.info("Simluation mode possible.")
+        pass
+
+    def process_event(self, event):
+        """Process I/O Events.
+
+        Parameters
+        ----------
+        event : `aionotify.Event`
+            Payload containing the I/O event information.
+        """
+        self.log.info(f"Event: Flags = {event.flags}, Name = {event.name}")
+        if event.flags & aionotify.Flags.CLOSE_WRITE:
+            if event.name.endswith("yaml"):
+                self.process_yaml_file(event.name)
+            if event.name.endswith("dat"):
+                self.log.info("Process DAT file.")
+
+    def process_yaml_file(self, ifile):
+        """Process the UI configuration YAML file and send telemetry.
+
+        Parameters
+        ----------
+        ifile : str
+          The filename to read and process.
+        """
+        self.log.info(f"Process {ifile} file.")
+        with open(os.path.join(self.telemetry_directory, ifile)) as infile:
+            self.log.info("UI Config file opened.")
+            content = yaml.safe_load(infile)
+            self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
+                                           uiVersionCode=content['ui_versions']['code'],
+                                           uiVersionConfig=content['ui_versions']['config'],
+                                           cameraName=content['camera']['name'],
+                                           cameraFps=content['camera']['fps'],
+                                           dataBufferSize=content['data']['buffer_size'],
+                                           dataAcquisitionTime=content['data']['acquisition_time'])
 
     async def simulated_telemetry_loop(self):
         """Run the simulated telemetry loop.
@@ -141,6 +234,17 @@ class DSMCSC(salobj.BaseCsc):
             self.log.info('Writing simulated telemetry data file.')
 
             await asyncio.sleep(SIMULATION_LOOP_SLEEP)
+
+    async def telemetry_loop(self):
+        """Run the telemetry loop.
+        """
+        if self.telemetry_loop_running:
+            raise IOError('Telemetry loop still running...')
+        self.telemetry_loop_running = True
+
+        while self.telemetry_loop_running:
+            ioevent = await self.telemetry_watcher.get_event()
+            self.process_event(ioevent)
 
     async def wait_loop(self, loop):
         """A utility method to wait for a task to die or cancel it and handle

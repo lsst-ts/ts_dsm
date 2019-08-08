@@ -1,5 +1,6 @@
 import aionotify
 import asyncio
+import csv
 import logging
 import os
 import tempfile
@@ -7,7 +8,7 @@ import yaml
 
 from lsst.ts import salobj
 
-from lsst.ts.dsm import create_telemetry_config, create_telemetry_data
+from lsst.ts.dsm import convert_time, create_telemetry_config, create_telemetry_data
 
 __all__ = ['DSMCSC']
 
@@ -182,6 +183,28 @@ class DSMCSC(salobj.BaseCsc):
         self.log.info("Simluation mode possible.")
         pass
 
+    def process_dat_file(self, ifile):
+        """Process the dome seeing DAT file and send telemetry.
+
+        Parameters
+        ----------
+        ifile : str
+          The filename to read and process.
+        """
+        self.log.info(f"Process {ifile} file.")
+        with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
+            self.log.info("Telemetry file opened.")
+            reader = csv.reader(infile)
+            for row in reader:
+                self.log.info(f"Row: {row}")
+                self.tel_domeSeeing.set_put(dsmIndex=self.salinfo.index,
+                                            timestampCurrent=convert_time(row[0]),
+                                            timestampFirstMeasurement=convert_time(row[1]),
+                                            timestampLastMeasurement=convert_time(row[2]),
+                                            rmsX=row[3],
+                                            rmsY=row[4])
+                self.log.info("Done row.")
+
     def process_event(self, event):
         """Process I/O Events.
 
@@ -195,7 +218,7 @@ class DSMCSC(salobj.BaseCsc):
             if event.name.endswith("yaml"):
                 self.process_yaml_file(event.name)
             if event.name.endswith("dat"):
-                self.log.info("Process DAT file.")
+                self.process_dat_file(event.name)
 
     def process_yaml_file(self, ifile):
         """Process the UI configuration YAML file and send telemetry.
@@ -206,7 +229,7 @@ class DSMCSC(salobj.BaseCsc):
           The filename to read and process.
         """
         self.log.info(f"Process {ifile} file.")
-        with open(os.path.join(self.telemetry_directory, ifile)) as infile:
+        with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
             self.log.info("UI Config file opened.")
             content = yaml.safe_load(infile)
             self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
@@ -216,6 +239,7 @@ class DSMCSC(salobj.BaseCsc):
                                            cameraFps=content['camera']['fps'],
                                            dataBufferSize=content['data']['buffer_size'],
                                            dataAcquisitionTime=content['data']['acquisition_time'])
+            self.log.info("Done with UI config file.")
 
     async def simulated_telemetry_loop(self):
         """Run the simulated telemetry loop.

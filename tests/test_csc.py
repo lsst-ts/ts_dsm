@@ -11,6 +11,7 @@ np.random.seed(47)
 
 index_gen = salobj.index_generator()
 
+STD_TIMEOUT = 2
 LONG_TIMEOUT = 20  # timeout for starting SAL components (sec)
 
 
@@ -76,14 +77,29 @@ class TestDSMCSC(unittest.TestCase):
 
                 # Check that the telemetry loop is running
                 self.assertTrue(harness.csc.telemetry_loop_running)
-                # configuration = harness.remote.tel_configuration.get()
-                # self.assertEqual(configuration.dsmIndex, 1)
-                # self.assertEqual(configuration.uiVersionCode, '1.0.1')
-                # self.assertEqual(configuration.uiVersionConfig, '1.4.4')
-                # self.assertEqual(configuration.cameraName, 'Vimba')
-                # self.assertEqual(configuration.cameraFps, 40)
-                # self.assertEqual(configuration.dataBufferSize, 1024)
-                # self.assertEqual(configuration.dataAcquisitionTime, 25)
+                configuration = await harness.remote.tel_configuration.next(flush=True, timeout=STD_TIMEOUT)
+                self.assertEqual(configuration.dsmIndex, 1)
+                self.assertEqual(configuration.uiVersionCode, '1.0.1')
+                self.assertEqual(configuration.uiVersionConfig, '1.4.4')
+                self.assertEqual(configuration.cameraName, 'Vimba')
+                self.assertEqual(configuration.cameraFps, 40)
+                self.assertEqual(configuration.dataBufferSize, 1024)
+                self.assertEqual(configuration.dataAcquisitionTime, 25)
+
+                # dome_seeing = await harness.remote.tel_domeSeeing.next(
+                #     flush=True, timeout=STD_TIMEOUT)
+                # self.assertEqual(dome_seeing.dsmIndex, 1)
+                # self.assertIsInstance(dome_seeing.timestampCurrent, float)
+                # self.assertIsInstance(dome_seeing.timestampFirstMeasurement,
+                #                       float)
+                # self.assertIsInstance(dome_seeing.timestampLastMeasurement,
+                #                       float)
+                # self.assertIsInstance(dome_seeing.rmsX, float)
+                # self.assertGreater(dome_seeing.rmsX, 0)
+                # self.assertIsInstance(dome_seeing.rmsY, float)
+                # self.assertGreater(dome_seeing.rmsY, 0)
+                # # Only for simulation!
+                # self.assertEqual(dome_seeing.rmsX, dome_seeing.rmsY)
 
                 # Move to ENABLED state
                 id_ack = await harness.remote.cmd_enable.start(timeout=120)

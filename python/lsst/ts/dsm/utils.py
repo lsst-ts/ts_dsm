@@ -1,11 +1,30 @@
 import csv
-from datetime import datetime, timedelta
 import os
 import yaml
 
+from astropy.time import Time, TimeDelta
 import numpy as np
+import pytz
 
-__all__ = ['create_telemetry_config', 'create_telemetry_data']
+__all__ = ['convert_time', 'create_telemetry_config', 'create_telemetry_data']
+
+
+def convert_time(in_time):
+    """Convert an ISO UTC timestring to TAI timestamp.
+
+    Parameters
+    ----------
+    in_time : str
+        The time to convert.
+
+    Returns
+    -------
+    float
+        The TAI time corresponding to the input.
+    """
+    ptime = Time(in_time, scale='utc')
+    # replace allows this to work if clock isn't in UTC.
+    return ptime.tai.datetime.replace(tzinfo=pytz.utc).timestamp()
 
 
 def create_telemetry_config(output_dir):
@@ -43,11 +62,11 @@ def create_telemetry_data(output_dir):
     output_dir : str
         Directory to write the telemetry data file.
     """
-    now = datetime.utcnow()
-    first = now - timedelta(seconds=25)
+    now = Time.now()
+    first = now - TimeDelta(25, format='sec')
     rms_roi = np.random.random()
 
-    output = [now.isoformat(), first.isoformat(), now.isoformat(), rms_roi, rms_roi]
+    output = [now.isot, first.isot, now.isot, rms_roi, rms_roi]
 
     telemetry_file = 'dsm_{}.dat'.format(now.strftime('%Y%m%d_%H%M%S'))
     with open(os.path.join(output_dir, telemetry_file), 'w') as csv_file:

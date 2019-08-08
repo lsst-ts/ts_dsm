@@ -3,6 +3,7 @@
 # - Common third-party packages can be assumed to be recursively included by
 #   the "base" package.
 setupRequired(sconsUtils)
+setupRequired(astropy)
 setupRequired(ts_salobj)
 
 # The following is boilerplate for all packages.

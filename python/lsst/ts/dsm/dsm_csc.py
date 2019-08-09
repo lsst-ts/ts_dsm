@@ -201,8 +201,8 @@ class DSMCSC(salobj.BaseCsc):
                                             timestampCurrent=convert_time(row[0]),
                                             timestampFirstMeasurement=convert_time(row[1]),
                                             timestampLastMeasurement=convert_time(row[2]),
-                                            rmsX=row[3],
-                                            rmsY=row[4])
+                                            rmsX=float(row[3]),
+                                            rmsY=float(row[4]))
                 self.log.info("Done row.")
 
     def process_event(self, event):

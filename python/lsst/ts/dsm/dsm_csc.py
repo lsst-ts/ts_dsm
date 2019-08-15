@@ -1,10 +1,12 @@
-import aionotify
 import asyncio
 import csv
 import logging
 import os
+import pathlib
 import tempfile
 import yaml
+
+import aionotify
 
 from lsst.ts import salobj
 
@@ -12,15 +14,14 @@ from lsst.ts.dsm import convert_time, create_telemetry_config, create_telemetry_
 
 __all__ = ['DSMCSC']
 
-SIMULATION_LOOP_SLEEP = 1  # seconds
 
-
-class DSMCSC(salobj.BaseCsc):
+class DSMCSC(salobj.ConfigurableCsc):
     """
     Commandable SAL Component to interface with the LSST DSMs.
     """
 
-    def __init__(self, index, initial_state=salobj.State.STANDBY, initial_simulation_mode=0):
+    def __init__(self, index, config_dir=None, initial_state=salobj.State.STANDBY,
+                 initial_simulation_mode=0):
         """
         Initialize DSM CSC.
 
@@ -29,6 +30,8 @@ class DSMCSC(salobj.BaseCsc):
         index : int
             Index for the DSM. This enables the control of multiple DSMs.
         """
+        schema_path = pathlib.Path(__file__).resolve().parents[4].joinpath("schema", "DSM.yaml")
+
         self.telemetry_directory = None
         self.telemetry_loop_running = False
         self.telemetry_loop_task = None
@@ -36,10 +39,13 @@ class DSMCSC(salobj.BaseCsc):
         self.simulated_telemetry_ui_config_written = False
         self.simulated_telemetry_loop_running = False
         self.simulated_telemetry_task = None
+        self.simulation_loop_time = None
+        self.config = None
 
         self.loop_die_timeout = 5  # how long to wait for the loops to die?
 
-        super().__init__("DSM", index, initial_state=initial_state,
+        super().__init__("DSM", index, schema_path=schema_path, config_dir=config_dir,
+                         initial_state=initial_state,
                          initial_simulation_mode=initial_simulation_mode)
 
         ch = logging.StreamHandler()
@@ -87,6 +93,7 @@ class DSMCSC(salobj.BaseCsc):
         id_data : `CommandIdData`
             Command ID and data
         """
+        await super().begin_start(id_data)
         if self.simulation_mode and self.telemetry_directory is None:
             self.telemetry_directory = tempfile.mkdtemp()
             self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
@@ -97,6 +104,19 @@ class DSMCSC(salobj.BaseCsc):
         if os.path.exists(self.telemetry_directory):
             for tfile in os.listdir(self.telemetry_directory):
                 os.remove(os.path.join(self.telemetry_directory, tfile))
+
+    async def configure(self, config):
+        """Send settingsApplied messages.
+
+        Parameters
+        ----------
+        config : `types.SimpleNamespace`
+            The current configuration.
+        """
+        self.config = config
+        self.simulation_loop_time = self.config.simulation_loop_time
+        if self.config.telemetry_directory != "None":
+            self.telemetry_directory = self.config.telemetry_directory
 
     async def do_standby(self, id_data):
         """Transition to from `State.DISABLED` to `State.STANDBY`.
@@ -172,6 +192,17 @@ class DSMCSC(salobj.BaseCsc):
         if self.simulation_mode:
             self.simulated_telemetry_task = asyncio.ensure_future(self.simulated_telemetry_loop())
 
+    @staticmethod
+    def get_config_pkg():
+        """Provide the configuration repository / directory.
+
+        Returns
+        -------
+        str
+            The configuration repository / directory.
+        """
+        return "ts_config_eas"
+
     async def implement_simulation_mode(self, simulation_mode):
         """Setup items related to simulation mode.
 
@@ -179,9 +210,17 @@ class DSMCSC(salobj.BaseCsc):
         ----------
         simulation_mode : int
             Constant that declares simulation mode or not.
+
+        Raises
+        ------
+        salobj.ExpectedError
+            Warns user if correct simulation mode value is not provided.
         """
-        self.log.info("Simluation mode possible.")
-        pass
+        if simulation_mode not in (0, 1):
+            raise salobj.ExpectedError(f"Simulation_mode={simulation_mode} must be 0 or 1")
+
+        if self.simulation_mode == simulation_mode:
+            return
 
     def process_dat_file(self, ifile):
         """Process the dome seeing DAT file and send telemetry.
@@ -257,7 +296,7 @@ class DSMCSC(salobj.BaseCsc):
             create_telemetry_data(self.telemetry_directory)
             self.log.info('Writing simulated telemetry data file.')
 
-            await asyncio.sleep(SIMULATION_LOOP_SLEEP)
+            await asyncio.sleep(self.simulation_loop_time)
 
     async def telemetry_loop(self):
         """Run the telemetry loop.

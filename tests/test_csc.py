@@ -65,7 +65,6 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(harness.csc.simulation_mode, 1)
                 self.assertIsNone(harness.csc.telemetry_directory)
                 self.assertIsNone(harness.csc.config)
-                self.telemetry_directory = harness.csc.telemetry_directory
 
                 # Move to DISABLED state
                 harness.remote.cmd_start.set(settingsToApply='fast_simulation')
@@ -74,6 +73,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
                 self.assertEqual(id_ack.error, 0)
                 self.assertEqual(state.summaryState, salobj.State.DISABLED)
+                self.telemetry_directory = harness.csc.telemetry_directory
 
                 # Check that the simulated telemetry loop is running
                 self.assertIsNotNone(harness.csc.telemetry_directory)
@@ -200,6 +200,14 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertTrue(harness.csc.telemetry_directory.startswith('/tmp'))
                 self.assertEqual(harness.csc.simulation_loop_time, harness.csc.config.simulation_loop_time)
                 self.assertGreater(harness.csc.config.simulation_loop_time, 0)
+                self.telemetry_directory = harness.csc.telemetry_directory
+
+                # Return to STANDBY to shutdown loops
+                id_ack = await harness.remote.cmd_standby.start(timeout=120)
+                state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+                self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
+                self.assertEqual(id_ack.error, 0)
+                self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
         asyncio.get_event_loop().run_until_complete(doit())
 

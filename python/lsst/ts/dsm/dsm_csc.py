@@ -93,10 +93,11 @@ class DSMCSC(salobj.ConfigurableCsc):
         id_data : `CommandIdData`
             Command ID and data
         """
-        await super().begin_start(id_data)
         if self.simulation_mode and self.telemetry_directory is None:
             self.telemetry_directory = tempfile.mkdtemp()
             self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
+
+        await super().begin_start(id_data)
 
     def cleanup_simulation(self):
         """Remove all generated files and directory from simulation
@@ -117,6 +118,9 @@ class DSMCSC(salobj.ConfigurableCsc):
         self.simulation_loop_time = self.config.simulation_loop_time
         if self.config.telemetry_directory != "None":
             self.telemetry_directory = self.config.telemetry_directory
+
+        self.evt_settingsApplied.set_put(telemetryDirectory=self.telemetry_directory,
+                                         simulationLoopTime=self.simulation_loop_time)
 
     async def do_standby(self, id_data):
         """Transition to from `State.DISABLED` to `State.STANDBY`.

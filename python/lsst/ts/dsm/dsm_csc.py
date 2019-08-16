@@ -155,6 +155,7 @@ class DSMCSC(salobj.ConfigurableCsc):
             Command ID and data
         """
         await super().do_start(id_data)
+        self.log.info(f"Telemetry dir: {self.telemetry_directory}")
         try:
             self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)
             loop = asyncio.get_running_loop()

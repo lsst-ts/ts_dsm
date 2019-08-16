@@ -8,7 +8,7 @@ from lsst.ts import salobj
 
 async def startup(opts):
     if opts.simulate:
-        settings_to_apply = "simulation"
+        settings_to_apply = opts.sim_mode + "_simulation"
     else:
         settings_to_apply = "default"
 
@@ -44,6 +44,9 @@ if __name__ == '__main__':
                        help="Run in simulation mode?")
     group.add_argument("-d", "--default", action="store_true",
                        help="Run in default (normal) mode?")
+    parser.add_argument("-m", "--sim-mode", dest="sim_mode", type=str, choices=["fast", "slow"],
+                        default="fast",
+                        help="Set speed of simulation loop via configuration.")
     args = parser.parse_args()
 
     main(args)

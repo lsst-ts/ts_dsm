@@ -271,10 +271,12 @@ class DSMCSC(salobj.ConfigurableCsc):
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
             self.log.info("UI Config file opened.")
             content = yaml.safe_load(infile)
+            ui_config_file = pathlib.PosixPath(content['ui_versions']['config_file']).as_uri()
             self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
                                            timestampConfigStart=convert_time(content['timestamp']),
                                            uiVersionCode=content['ui_versions']['code'],
                                            uiVersionConfig=content['ui_versions']['config'],
+                                           uiConfigFile=ui_config_file,
                                            cameraName=content['camera']['name'],
                                            cameraFps=content['camera']['fps'],
                                            dataBufferSize=content['data']['buffer_size'],

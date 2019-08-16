@@ -90,6 +90,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertGreater(configuration.timestampConfigStart, 0)
                 self.assertEqual(configuration.uiVersionCode, '1.0.1')
                 self.assertEqual(configuration.uiVersionConfig, '1.4.4')
+                self.assertEqual(configuration.uiConfigFile, 'file:///dsm/ui_dsm_config/default.yaml')
                 self.assertEqual(configuration.cameraName, 'Vimba')
                 self.assertEqual(configuration.cameraFps, 40)
                 self.assertEqual(configuration.dataBufferSize, 1024)

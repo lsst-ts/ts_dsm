@@ -272,6 +272,7 @@ class DSMCSC(salobj.ConfigurableCsc):
             self.log.info("UI Config file opened.")
             content = yaml.safe_load(infile)
             self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
+                                           timestampConfigStart=convert_time(content['timestamp']),
                                            uiVersionCode=content['ui_versions']['code'],
                                            uiVersionConfig=content['ui_versions']['config'],
                                            cameraName=content['camera']['name'],

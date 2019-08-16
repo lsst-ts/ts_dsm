@@ -43,7 +43,8 @@ def create_telemetry_config(output_dir):
     data_buffer_size = 1024
     data_acquisition_time = 25
 
-    content = {'ui_versions': {'code': ui_version, 'config': ui_config_version,
+    content = {'timestamp': Time.now().isot,
+               'ui_versions': {'code': ui_version, 'config': ui_config_version,
                                'config_file': ui_config_file},
                'camera': {'name': camera_name,
                           'fps': camera_fps},

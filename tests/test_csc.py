@@ -87,6 +87,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertTrue(harness.csc.telemetry_loop_running)
                 configuration = await harness.remote.tel_configuration.next(flush=True, timeout=STD_TIMEOUT)
                 self.assertEqual(configuration.dsmIndex, 1)
+                self.assertGreater(configuration.timestampConfigStart, 0)
                 self.assertEqual(configuration.uiVersionCode, '1.0.1')
                 self.assertEqual(configuration.uiVersionConfig, '1.4.4')
                 self.assertEqual(configuration.cameraName, 'Vimba')

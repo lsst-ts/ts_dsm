@@ -85,7 +85,7 @@ class TestDSMCSC(unittest.TestCase):
 
                 # Check that the telemetry loop is running
                 self.assertTrue(harness.csc.telemetry_loop_running)
-                configuration = await harness.remote.tel_configuration.next(flush=True, timeout=STD_TIMEOUT)
+                configuration = await harness.remote.tel_configuration.next(flush=True, timeout=LONG_TIMEOUT)
                 self.assertEqual(configuration.dsmIndex, 1)
                 self.assertGreater(configuration.timestampConfigStart, 0)
                 self.assertEqual(configuration.uiVersionCode, '1.0.1')

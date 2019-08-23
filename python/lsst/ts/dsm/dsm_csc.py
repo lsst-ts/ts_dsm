@@ -95,7 +95,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         """
         if self.simulation_mode and self.telemetry_directory is None:
             self.telemetry_directory = tempfile.mkdtemp()
-            self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
+            self.log.debug(f"Creating temporary directory: {self.telemetry_directory}")
 
         await super().begin_start(id_data)
 
@@ -193,7 +193,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         id_data : `CommandIdData`
             Command ID and data
         """
-        self.log.info("Finishing start command.")
+        self.log.debug("Finishing start command.")
         if self.simulation_mode:
             self.simulated_telemetry_task = asyncio.ensure_future(self.simulated_telemetry_loop())
 
@@ -237,17 +237,17 @@ class DSMCSC(salobj.ConfigurableCsc):
         """
         self.log.info(f"Process {ifile} file.")
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
-            self.log.info("Telemetry file opened.")
+            self.log.debug("Telemetry file opened.")
             reader = csv.reader(infile)
             for row in reader:
-                self.log.info(f"Row: {row}")
+                self.log.debug(f"Row: {row}")
                 self.tel_domeSeeing.set_put(dsmIndex=self.salinfo.index,
                                             timestampCurrent=convert_time(row[0]),
                                             timestampFirstMeasurement=convert_time(row[1]),
                                             timestampLastMeasurement=convert_time(row[2]),
                                             rmsX=float(row[3]),
                                             rmsY=float(row[4]))
-                self.log.info("Done row.")
+                self.log.debug("Done row.")
 
     def process_event(self, event):
         """Process I/O Events.
@@ -257,7 +257,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         event : `aionotify.Event`
             Payload containing the I/O event information.
         """
-        self.log.info(f"Event: Flags = {event.flags}, Name = {event.name}")
+        self.log.debug(f"Event: Flags = {event.flags}, Name = {event.name}")
         if event.flags & aionotify.Flags.CLOSE_WRITE:
             if event.name.endswith("yaml"):
                 self.process_yaml_file(event.name)
@@ -274,7 +274,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         """
         self.log.info(f"Process {ifile} file.")
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
-            self.log.info("UI Config file opened.")
+            self.log.debug("UI Config file opened.")
             content = yaml.safe_load(infile)
             ui_config_file = pathlib.PosixPath(content['ui_versions']['config_file']).as_uri()
             self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
@@ -286,7 +286,7 @@ class DSMCSC(salobj.ConfigurableCsc):
                                            cameraFps=content['camera']['fps'],
                                            dataBufferSize=content['data']['buffer_size'],
                                            dataAcquisitionTime=content['data']['acquisition_time'])
-            self.log.info("Done with UI config file.")
+            self.log.debug("Done with UI config file.")
 
     async def simulated_telemetry_loop(self):
         """Run the simulated telemetry loop.
@@ -298,11 +298,11 @@ class DSMCSC(salobj.ConfigurableCsc):
         while self.simulated_telemetry_loop_running:
             if not self.simulated_telemetry_ui_config_written:
                 create_telemetry_config(self.telemetry_directory)
-                self.log.info('Writing simulated UI configuration file.')
+                self.log.debug('Writing simulated UI configuration file.')
                 self.simulated_telemetry_ui_config_written = True
 
             create_telemetry_data(self.telemetry_directory)
-            self.log.info('Writing simulated telemetry data file.')
+            self.log.debug('Writing simulated telemetry data file.')
 
             await asyncio.sleep(self.simulation_loop_time)
 

@@ -29,6 +29,12 @@ class DSMCSC(salobj.ConfigurableCsc):
         ----------
         index : int
             Index for the DSM. This enables the control of multiple DSMs.
+        config_dir : str, optional
+            The location of the CSC configuration files.ß
+        initial_state : `salobj.State`, optional
+            State to place CSC in after initialization.
+        initial_simulation_mode : int, optional
+            Flag to determine mode of operation.
         """
         schema_path = pathlib.Path(__file__).resolve().parents[4].joinpath("schema", "DSM.yaml")
 

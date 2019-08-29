@@ -10,7 +10,7 @@ import aionotify
 
 from lsst.ts import salobj
 
-from lsst.ts.dsm import convert_time, create_telemetry_config, create_telemetry_data
+from . import utils
 
 __all__ = ['DSMCSC']
 
@@ -248,9 +248,9 @@ class DSMCSC(salobj.ConfigurableCsc):
             for row in reader:
                 self.log.debug(f"Row: {row}")
                 self.tel_domeSeeing.set_put(dsmIndex=self.salinfo.index,
-                                            timestampCurrent=convert_time(row[0]),
-                                            timestampFirstMeasurement=convert_time(row[1]),
-                                            timestampLastMeasurement=convert_time(row[2]),
+                                            timestampCurrent=utils.convert_time(row[0]),
+                                            timestampFirstMeasurement=utils.convert_time(row[1]),
+                                            timestampLastMeasurement=utils.convert_time(row[2]),
                                             rmsX=float(row[3]),
                                             rmsY=float(row[4]))
                 self.log.debug("Done row.")
@@ -284,7 +284,7 @@ class DSMCSC(salobj.ConfigurableCsc):
             content = yaml.safe_load(infile)
             ui_config_file = pathlib.PosixPath(content['ui_versions']['config_file']).as_uri()
             self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
-                                           timestampConfigStart=convert_time(content['timestamp']),
+                                           timestampConfigStart=utils.convert_time(content['timestamp']),
                                            uiVersionCode=content['ui_versions']['code'],
                                            uiVersionConfig=content['ui_versions']['config'],
                                            uiConfigFile=ui_config_file,
@@ -303,11 +303,11 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         while self.simulated_telemetry_loop_running:
             if not self.simulated_telemetry_ui_config_written:
-                create_telemetry_config(self.telemetry_directory)
+                utils.create_telemetry_config(self.telemetry_directory)
                 self.log.debug('Writing simulated UI configuration file.')
                 self.simulated_telemetry_ui_config_written = True
 
-            create_telemetry_data(self.telemetry_directory)
+            utils.create_telemetry_data(self.telemetry_directory)
             self.log.debug('Writing simulated telemetry data file.')
 
             await asyncio.sleep(self.simulation_loop_time)

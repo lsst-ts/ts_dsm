@@ -3,6 +3,7 @@ import asyncio
 import numpy as np
 import os
 import pathlib
+import shutil
 import yaml
 
 from lsst.ts import salobj
@@ -48,9 +49,7 @@ class TestDSMCSC(unittest.TestCase):
         """Cleanup telemetry directory if tests fail.
         """
         if os.path.exists(directory):
-            for tfile in os.listdir(directory):
-                os.remove(os.path.join(directory, tfile))
-            os.removedirs(directory)
+            shutil.rmtree(directory)
 
     def test_lifecycle_behavior(self):
         """Test that the DSM through the standard lifecycle.

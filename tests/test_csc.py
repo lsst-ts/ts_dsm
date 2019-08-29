@@ -68,7 +68,7 @@ class TestDSMCSC(unittest.TestCase):
 
                 # Move to DISABLED state
                 harness.remote.cmd_start.set(settingsToApply='fast_simulation')
-                id_ack = await harness.remote.cmd_start.start(timeout=120)
+                id_ack = await harness.remote.cmd_start.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
                 self.assertEqual(id_ack.error, 0)
@@ -109,7 +109,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(dome_seeing.rmsX, dome_seeing.rmsY)
 
                 # Move to ENABLED state
-                id_ack = await harness.remote.cmd_enable.start(timeout=120)
+                id_ack = await harness.remote.cmd_enable.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
                 self.assertEqual(id_ack.error, 0)
@@ -126,7 +126,7 @@ class TestDSMCSC(unittest.TestCase):
                 await asyncio.sleep(1)
 
                 # Move to DISABLED state
-                id_ack = await harness.remote.cmd_disable.start(timeout=120)
+                id_ack = await harness.remote.cmd_disable.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
                 self.assertEqual(id_ack.error, 0)
@@ -141,7 +141,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertTrue(harness.csc.telemetry_loop_running)
 
                 # Move to STANBY state
-                id_ack = await harness.remote.cmd_standby.start(timeout=120)
+                id_ack = await harness.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
                 self.assertEqual(id_ack.error, 0)
@@ -203,7 +203,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.telemetry_directory = harness.csc.telemetry_directory
 
                 # Return to STANDBY to shutdown loops
-                id_ack = await harness.remote.cmd_standby.start(timeout=120)
+                id_ack = await harness.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(id_ack.ack, salobj.SalRetCode.CMD_COMPLETE)
                 self.assertEqual(id_ack.error, 0)

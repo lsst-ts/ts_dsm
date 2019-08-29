@@ -14,7 +14,7 @@ def convert_time(in_time):
 
     Parameters
     ----------
-    in_time : str
+    in_time : `str`
         The time to convert.
 
     Returns
@@ -32,7 +32,7 @@ def create_telemetry_config(output_dir):
 
     Parameters
     ----------
-    output_dir : str
+    output_dir : `str`
         Directory to write the telemetry UI configuration file.
     """
     ui_version = '1.0.1'
@@ -60,7 +60,7 @@ def create_telemetry_data(output_dir):
     """
     Parameters
     ----------
-    output_dir : str
+    output_dir : `str`
         Directory to write the telemetry data file.
     """
     now = Time.now()

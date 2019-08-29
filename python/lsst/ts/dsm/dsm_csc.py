@@ -27,13 +27,13 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         Parameters
         ----------
-        index : int
+        index : `int`
             Index for the DSM. This enables the control of multiple DSMs.
-        config_dir : str, optional
-            The location of the CSC configuration files.ß
-        initial_state : `salobj.State`, optional
+        config_dir : `str`, optional
+            The location of the CSC configuration files.
+        initial_state : `lsst.ts.salobj.State`, optional
             State to place CSC in after initialization.
-        initial_simulation_mode : int, optional
+        initial_simulation_mode : `int`, optional
             Flag to determine mode of operation.
         """
         schema_path = pathlib.Path(__file__).resolve().parents[4].joinpath("schema", "DSM.yaml")
@@ -209,7 +209,7 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         Returns
         -------
-        str
+        `str`
             The configuration repository / directory.
         """
         return "ts_config_eas"
@@ -219,12 +219,12 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         Parameters
         ----------
-        simulation_mode : int
+        simulation_mode : `int`
             Constant that declares simulation mode or not.
 
         Raises
         ------
-        salobj.ExpectedError
+        `lsst.ts.salobj.ExpectedError`
             Warns user if correct simulation mode value is not provided.
         """
         if simulation_mode not in (0, 1):
@@ -238,7 +238,7 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         Parameters
         ----------
-        ifile : str
+        ifile : `str`
           The filename to read and process.
         """
         self.log.info(f"Process {ifile} file.")
@@ -275,7 +275,7 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         Parameters
         ----------
-        ifile : str
+        ifile : `str`
           The filename to read and process.
         """
         self.log.info(f"Process {ifile} file.")

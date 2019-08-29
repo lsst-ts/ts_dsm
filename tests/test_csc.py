@@ -134,7 +134,7 @@ class TestDSMCSC(unittest.TestCase):
                 # Telemetry loop should still be running
                 self.assertTrue(harness.csc.telemetry_loop_running)
 
-                # Move to STANBY state
+                # Move to STANDBY state
                 await harness.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)

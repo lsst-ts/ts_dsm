@@ -249,14 +249,17 @@ class DSMCSC(salobj.ConfigurableCsc):
             self.log.debug("Telemetry file opened.")
             reader = csv.reader(infile)
             for row in reader:
-                self.log.debug(f"Row: {row}")
-                self.tel_domeSeeing.set_put(dsmIndex=self.salinfo.index,
-                                            timestampCurrent=utils.convert_time(row[0]),
-                                            timestampFirstMeasurement=utils.convert_time(row[1]),
-                                            timestampLastMeasurement=utils.convert_time(row[2]),
-                                            rmsX=float(row[3]),
-                                            rmsY=float(row[4]))
-                self.log.debug("Done row.")
+                try:
+                    self.log.debug(f"Row: {row}")
+                    self.tel_domeSeeing.set_put(dsmIndex=self.salinfo.index,
+                                                timestampCurrent=utils.convert_time(row[0]),
+                                                timestampFirstMeasurement=utils.convert_time(row[1]),
+                                                timestampLastMeasurement=utils.convert_time(row[2]),
+                                                rmsX=float(row[3]),
+                                                rmsY=float(row[4]))
+                    self.log.debug("Done row.")
+                except IndexError as error:
+                    self.log.error(f"{ifile}: {error}")
 
     def process_event(self, event):
         """Process I/O Events.

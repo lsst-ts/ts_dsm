@@ -62,7 +62,9 @@ class TestDSMCSC(unittest.TestCase):
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)
                 self.assertEqual(harness.csc.simulation_mode, 1)
-                self.assertIsNone(harness.csc.telemetry_directory)
+                self.assertIsNotNone(harness.csc.telemetry_directory)
+                self.telemetry_directory = harness.csc.telemetry_directory
+                # self.assertIsNone(harness.csc.telemetry_directory)
                 self.assertIsNone(harness.csc.config)
 
                 # Move to DISABLED state
@@ -76,12 +78,12 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertIsNotNone(harness.csc.telemetry_directory)
                 self.assertTrue(os.path.exists(harness.csc.telemetry_directory))
                 self.telemetry_directory = harness.csc.telemetry_directory
-                self.assertTrue(harness.csc.simulated_telemetry_loop_running)
+                self.assertFalse(harness.csc.simulated_telemetry_loop_task.done())
                 sim_files = len(list(os.listdir(harness.csc.telemetry_directory)))
                 self.assertEqual(sim_files, 2)
 
                 # Check that the telemetry loop is running
-                self.assertTrue(harness.csc.telemetry_loop_running)
+                self.assertFalse(harness.csc.telemetry_loop_task.done())
                 configuration = await harness.remote.tel_configuration.next(flush=True, timeout=LONG_TIMEOUT)
                 self.assertEqual(configuration.dsmIndex, 1)
                 self.assertGreater(configuration.timestampConfigStart, 0)
@@ -111,12 +113,12 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(state.summaryState, salobj.State.ENABLED)
 
                 # Simulation loop should still be running
-                self.assertTrue(harness.csc.simulated_telemetry_loop_running)
+                self.assertFalse(harness.csc.simulated_telemetry_loop_task.done())
                 sim_files = len(list(os.listdir(harness.csc.telemetry_directory)))
                 self.assertGreaterEqual(sim_files, 2)
 
                 # Telemetry loop should still be running
-                self.assertTrue(harness.csc.telemetry_loop_running)
+                self.assertFalse(harness.csc.telemetry_loop_task.done())
 
                 await asyncio.sleep(1)
 
@@ -126,12 +128,12 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(state.summaryState, salobj.State.DISABLED)
 
                 # Simulation loop should still be running
-                self.assertTrue(harness.csc.simulated_telemetry_loop_running)
+                self.assertFalse(harness.csc.simulated_telemetry_loop_task.done())
                 sim_files = len(list(os.listdir(harness.csc.telemetry_directory)))
                 self.assertGreater(sim_files, 2)
 
                 # Telemetry loop should still be running
-                self.assertTrue(harness.csc.telemetry_loop_running)
+                self.assertFalse(harness.csc.telemetry_loop_task.done())
 
                 # Move to STANDBY state
                 await harness.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
@@ -139,11 +141,11 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
                 # Simulation loop should no longer be running
-                self.assertFalse(harness.csc.simulated_telemetry_loop_running)
+                self.assertTrue(harness.csc.simulated_telemetry_loop_task.done())
                 self.assertFalse(harness.csc.simulated_telemetry_ui_config_written)
 
                 # Telemetry loop should no longer be running
-                self.assertFalse(harness.csc.telemetry_loop_running)
+                self.assertTrue(harness.csc.telemetry_loop_task.done())
 
         asyncio.get_event_loop().run_until_complete(doit())
 
@@ -158,6 +160,7 @@ class TestDSMCSC(unittest.TestCase):
                 desired_config_dir = pathlib.Path(desird_config_pkg_dir) / "DSM/v1"
                 self.assertEqual(harness.csc.get_config_pkg(), desired_config_pkg_name)
                 self.assertEqual(harness.csc.config_dir, desired_config_dir)
+                self.telemetry_directory = harness.csc.telemetry_directory
 
         asyncio.get_event_loop().run_until_complete(doit())
 

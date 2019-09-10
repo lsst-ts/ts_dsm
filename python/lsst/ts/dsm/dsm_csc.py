@@ -57,20 +57,22 @@ class DSMCSC(salobj.ConfigurableCsc):
         ch = logging.StreamHandler()
         self.log.addHandler(ch)
 
-    async def begin_exitControl(self, id_data):
-        """Begin do_exitControl; called after state changes but before command
-           acknowledged.
+    # async def begin_exitControl(self, id_data):
+    #     """Begin do_exitControl; called after state changes but before
+    # command
+    #        acknowledged.
 
-        This method will remove the telemetry directory if in simulation mode.
+    #     This method will remove the telemetry directory if in simulation
+    # mode.
 
-        Parameters
-        ----------
-        id_data : `CommandIdData`
-            Command ID and data
-        """
-        if self.simulation_mode:
-            if os.path.exists(self.telemetry_directory):
-                os.removedirs(self.telemetry_directory)
+    #     Parameters
+    #     ----------
+    #     id_data : `CommandIdData`
+    #         Command ID and data
+    #     """
+    #     if self.simulation_mode:
+    #         if os.path.exists(self.telemetry_directory):
+    #             os.removedirs(self.telemetry_directory)
 
     # async def begin_standby(self, id_data):
     #     """Begin do_standby; called after state changes but before command
@@ -112,6 +114,17 @@ class DSMCSC(salobj.ConfigurableCsc):
         if os.path.exists(self.telemetry_directory):
             for tfile in os.listdir(self.telemetry_directory):
                 os.remove(os.path.join(self.telemetry_directory, tfile))
+
+    async def close_tasks(self):
+        """Clean up
+
+        This method will remove the telemetry directory if in simulation mode.
+        """
+        if self.simulation_mode:
+            if os.path.exists(self.telemetry_directory):
+                os.removedirs(self.telemetry_directory)
+
+        await super().close_tasks()
 
     async def configure(self, config):
         """Send settingsApplied messages.

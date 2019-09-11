@@ -14,6 +14,10 @@ from . import utils
 
 __all__ = ['DSMCSC']
 
+REAL_TIME = 0
+FAST_SIMULATION = 1  # second
+SLOW_SIMULATION = 30  # seconds
+
 
 class DSMCSC(salobj.ConfigurableCsc):
     """
@@ -135,7 +139,7 @@ class DSMCSC(salobj.ConfigurableCsc):
             The current configuration.
         """
         self.config = config
-        self.simulation_loop_time = self.config.simulation_loop_time
+        # self.simulation_loop_time = self.config.simulation_loop_time
         if self.config.telemetry_directory != "None":
             self.telemetry_directory = self.config.telemetry_directory
 
@@ -243,11 +247,22 @@ class DSMCSC(salobj.ConfigurableCsc):
         `lsst.ts.salobj.ExpectedError`
             Warns user if correct simulation mode value is not provided.
         """
-        if simulation_mode not in (0, 1):
-            raise salobj.ExpectedError(f"Simulation_mode={simulation_mode} must be 0 or 1")
+        if simulation_mode not in (0, 1, 2):
+            raise salobj.ExpectedError(f"Simulation_mode={simulation_mode} must be 0, 1 or 2")
 
         if self.simulation_mode == simulation_mode:
             return
+
+        if simulation_mode and self.telemetry_directory is None:
+            self.telemetry_directory = tempfile.mkdtemp()
+            self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
+
+        if simulation_mode == 0:
+            self.simulation_loop_time = REAL_TIME
+        if simulation_mode == 1:
+            self.simulation_loop_time = FAST_SIMULATION
+        if simulation_mode == 2:
+            self.simulation_loop_time = SLOW_SIMULATION
 
     def process_dat_file(self, ifile):
         """Process the dome seeing DAT file and send telemetry.
@@ -326,9 +341,10 @@ class DSMCSC(salobj.ConfigurableCsc):
                 self.log.info("Adding simulated telemetry loop task.")
                 self.simulated_telemetry_loop_task = asyncio.ensure_future(self.simulated_telemetry_loop())
         else:
-            if self.simulation_mode and self.telemetry_directory is None:
-                self.telemetry_directory = tempfile.mkdtemp()
-                self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
+            # if self.simulation_mode and self.telemetry_directory is None:
+            #     self.telemetry_directory = tempfile.mkdtemp()
+            #     self.log.info(f"Creating temporary directory:
+            # {self.telemetry_directory}")
 
             if self.simulation_mode and not self.simulated_telemetry_loop_task.done():
                 self.log.info("Shutting down simulated telemetry loop.")

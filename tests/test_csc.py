@@ -63,8 +63,8 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)
                 self.assertEqual(harness.csc.simulation_mode, 1)
                 self.assertIsNotNone(harness.csc.telemetry_directory)
-                self.telemetry_directory = harness.csc.telemetry_directory
                 # self.assertIsNone(harness.csc.telemetry_directory)
+                self.telemetry_directory = harness.csc.telemetry_directory
                 self.assertIsNone(harness.csc.config)
 
                 # Move to DISABLED state

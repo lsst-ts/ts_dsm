@@ -220,10 +220,10 @@ class DSMCSC(salobj.ConfigurableCsc):
         self.log.debug(f"Current state: {self.summary_state}")
         if self.summary_state in (salobj.State.DISABLED, salobj.State.ENABLED):
             if self.telemetry_loop_task.done():
-                self.telemetry_loop_task = asyncio.ensure_future(self.telemetry_loop())
+                self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
 
             if self.simulation_mode and self.simulated_telemetry_loop_task.done():
-                self.simulated_telemetry_loop_task = asyncio.ensure_future(self.simulated_telemetry_loop())
+                self.simulated_telemetry_loop_task = asyncio.create_task(self.simulated_telemetry_loop())
         else:
             if self.simulation_mode:
                 self.simulated_telemetry_loop_task.cancel()

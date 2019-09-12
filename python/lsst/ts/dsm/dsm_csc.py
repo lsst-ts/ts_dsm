@@ -163,7 +163,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         ifile : `str`
           The filename to read and process.
         """
-        self.log.debug(f"Process {ifile} file.")
+        self.log.info(f"Process {ifile} file.")
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
             reader = csv.reader(infile)
             for row in reader:
@@ -200,7 +200,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         ifile : `str`
           The filename to read and process.
         """
-        self.log.debug(f"Process {ifile} file.")
+        self.log.info(f"Process {ifile} file.")
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
             content = yaml.safe_load(infile)
             ui_config_file = pathlib.PosixPath(content['ui_versions']['config_file']).as_uri()
@@ -217,6 +217,7 @@ class DSMCSC(salobj.ConfigurableCsc):
     def report_summary_state(self):
         """Handle things that depend on state.
         """
+        self.log.debug(f"Current state: {self.summary_state}")
         if self.summary_state in (salobj.State.DISABLED, salobj.State.ENABLED):
             if self.telemetry_loop_task.done():
                 self.telemetry_loop_task = asyncio.ensure_future(self.telemetry_loop())
@@ -224,14 +225,13 @@ class DSMCSC(salobj.ConfigurableCsc):
             if self.simulation_mode and self.simulated_telemetry_loop_task.done():
                 self.simulated_telemetry_loop_task = asyncio.ensure_future(self.simulated_telemetry_loop())
         else:
-            if self.simulation_mode and not self.simulated_telemetry_loop_task.done():
+            if self.simulation_mode:
                 self.simulated_telemetry_loop_task.cancel()
                 self.simulated_telemetry_ui_config_written = False
-
                 self.cleanup_simulation()
 
-            if not self.telemetry_loop_task.done():
-                self.telemetry_loop_task.cancel()
+            self.telemetry_loop_task.cancel()
+            if not self.telemetry_watcher.closed:
                 self.telemetry_watcher.unwatch(self.telemetry_directory)
                 self.telemetry_watcher.close()
 

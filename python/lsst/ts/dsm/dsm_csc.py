@@ -71,7 +71,7 @@ class DSMCSC(salobj.ConfigurableCsc):
             Command ID and data
         """
         await super().begin_start(id_data)
-        self.log.info(f"Telemetry dir: {self.telemetry_directory}")
+        self.log.debug(f"Telemetry dir: {self.telemetry_directory}")
         try:
             self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)
             loop = asyncio.get_running_loop()
@@ -146,7 +146,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         if simulation_mode:
             if self.telemetry_directory is None or not self.telemetry_directory.startswith("/tmp"):
                 self.telemetry_directory = tempfile.mkdtemp()
-                self.log.info(f"Creating temporary directory: {self.telemetry_directory}")
+                self.log.debug(f"Creating temporary directory: {self.telemetry_directory}")
 
         if simulation_mode == 0:
             self.simulation_loop_time = REAL_TIME
@@ -163,20 +163,17 @@ class DSMCSC(salobj.ConfigurableCsc):
         ifile : `str`
           The filename to read and process.
         """
-        self.log.info(f"Process {ifile} file.")
+        self.log.debug(f"Process {ifile} file.")
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
-            self.log.debug("Telemetry file opened.")
             reader = csv.reader(infile)
             for row in reader:
                 try:
-                    self.log.debug(f"Row: {row}")
                     self.tel_domeSeeing.set_put(dsmIndex=self.salinfo.index,
                                                 timestampCurrent=utils.convert_time(row[0]),
                                                 timestampFirstMeasurement=utils.convert_time(row[1]),
                                                 timestampLastMeasurement=utils.convert_time(row[2]),
                                                 rmsX=float(row[3]),
                                                 rmsY=float(row[4]))
-                    self.log.debug("Done row.")
                 except IndexError as error:
                     self.log.error(f"{ifile}: {error}")
 
@@ -203,9 +200,8 @@ class DSMCSC(salobj.ConfigurableCsc):
         ifile : `str`
           The filename to read and process.
         """
-        self.log.info(f"Process {ifile} file.")
+        self.log.debug(f"Process {ifile} file.")
         with open(os.path.join(self.telemetry_directory, ifile), 'r') as infile:
-            self.log.debug("UI Config file opened.")
             content = yaml.safe_load(infile)
             ui_config_file = pathlib.PosixPath(content['ui_versions']['config_file']).as_uri()
             self.tel_configuration.set_put(dsmIndex=self.salinfo.index,
@@ -217,31 +213,24 @@ class DSMCSC(salobj.ConfigurableCsc):
                                            cameraFps=content['camera']['fps'],
                                            dataBufferSize=content['data']['buffer_size'],
                                            dataAcquisitionTime=content['data']['acquisition_time'])
-            self.log.info("Done with UI config file.")
 
     def report_summary_state(self):
         """Handle things that depend on state.
         """
-        self.log.info(f"Current state: {self.summary_state}")
         if self.summary_state in (salobj.State.DISABLED, salobj.State.ENABLED):
             if self.telemetry_loop_task.done():
-                self.log.info("Adding telemetry loop task.")
                 self.telemetry_loop_task = asyncio.ensure_future(self.telemetry_loop())
 
             if self.simulation_mode and self.simulated_telemetry_loop_task.done():
-                self.log.info("Adding simulated telemetry loop task.")
                 self.simulated_telemetry_loop_task = asyncio.ensure_future(self.simulated_telemetry_loop())
         else:
             if self.simulation_mode and not self.simulated_telemetry_loop_task.done():
-                self.log.info("Shutting down simulated telemetry loop.")
                 self.simulated_telemetry_loop_task.cancel()
                 self.simulated_telemetry_ui_config_written = False
 
-                self.log.info("Cleanup simulation files.")
                 self.cleanup_simulation()
 
             if not self.telemetry_loop_task.done():
-                self.log.info("Shutting down telemetry loop.")
                 self.telemetry_loop_task.cancel()
                 self.telemetry_watcher.unwatch(self.telemetry_directory)
                 self.telemetry_watcher.close()
@@ -251,22 +240,18 @@ class DSMCSC(salobj.ConfigurableCsc):
     async def simulated_telemetry_loop(self):
         """Run the simulated telemetry loop.
         """
-
         while True:
             if not self.simulated_telemetry_ui_config_written:
                 utils.create_telemetry_config(self.telemetry_directory)
-                self.log.debug('Writing simulated UI configuration file.')
                 self.simulated_telemetry_ui_config_written = True
 
             utils.create_telemetry_data(self.telemetry_directory)
-            self.log.debug('Writing simulated telemetry data file.')
 
             await asyncio.sleep(self.simulation_loop_time)
 
     async def telemetry_loop(self):
         """Run the telemetry loop.
         """
-
         while True:
             ioevent = await self.telemetry_watcher.get_event()
             self.process_event(ioevent)

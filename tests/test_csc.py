@@ -4,7 +4,6 @@ import numpy as np
 import os
 import pathlib
 import shutil
-import yaml
 
 from lsst.ts import salobj
 
@@ -68,7 +67,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertIsNone(harness.csc.config)
 
                 # Move to DISABLED state
-                harness.remote.cmd_start.set(settingsToApply='fast_simulation')
+                harness.remote.cmd_start.set(settingsToApply='default')
                 await harness.remote.cmd_start.start(timeout=LONG_TIMEOUT)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.DISABLED)
@@ -171,12 +170,12 @@ class TestDSMCSC(unittest.TestCase):
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)
                 settings = await harness.remote.evt_settingVersions.next(flush=False, timeout=LONG_TIMEOUT)
-                settings_labels = ("fast_simulation", "slow_simulation")
+                settings_labels = ("default", "alternate")
                 for label in settings.recommendedSettingsLabels.split(','):
                     self.assertTrue(label in settings_labels)
                 self.assertEqual(settings.settingsUrl, TEST_CONFIG_DIR.as_uri())
 
-                harness.remote.cmd_start.set(settingsToApply="fast_simulation")
+                harness.remote.cmd_start.set(settingsToApply="default")
                 await harness.remote.cmd_start.start(timeout=STD_TIMEOUT)
                 self.assertEqual(harness.csc.summary_state, salobj.State.DISABLED)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=STD_TIMEOUT)
@@ -185,15 +184,8 @@ class TestDSMCSC(unittest.TestCase):
                                                                                  timeout=STD_TIMEOUT)
                 self.assertTrue(settings_applied.telemetryDirectory.startswith('/tmp'))
                 self.assertEqual(settings_applied.simulationLoopTime, 1)
-                config_path = os.path.join(TEST_CONFIG_DIR, "fast_simulation.yaml")
-                with open(config_path, "r") as f:
-                    config_raw = f.read()
-                config_data = yaml.safe_load(config_raw)
-                for field, value in config_data.items():
-                    self.assertEqual(getattr(harness.csc.config, field), value)
                 self.assertTrue(harness.csc.telemetry_directory.startswith('/tmp'))
-                self.assertEqual(harness.csc.simulation_loop_time, harness.csc.config.simulation_loop_time)
-                self.assertGreater(harness.csc.config.simulation_loop_time, 0)
+                self.assertEqual(harness.csc.simulation_loop_time, 1)
                 self.telemetry_directory = harness.csc.telemetry_directory
 
                 # Return to STANDBY to shutdown loops

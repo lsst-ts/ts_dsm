@@ -6,8 +6,4 @@ properties:
     description: The directory where the DSM UI telemetry files are written.
     type: string
     default: /home/saluser/develop/dsm_telemetry
-  simulation_loop_time:
-    description: The time (seconds) between sleeps in simulated file generation loop. -1 represents standard mode.
-    type: integer
-    default: -1
 additionalProperties: false

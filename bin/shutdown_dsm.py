@@ -26,7 +26,7 @@ def main(opts):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(f"Shutdown a running DSM")
+    parser = argparse.ArgumentParser(description="Shutdown (default: STANDBY) the DSM CSC.")
     parser.add_argument("-i", "--index", type=int, default=1,
                         help="SAL index; use the default value unless you sure you know what you are doing")
     parser.add_argument("-f", "--full", action="store_true",

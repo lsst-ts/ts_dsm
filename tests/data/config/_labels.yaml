@@ -1,0 +1,2 @@
+default: default.yaml
+alternate: alternate.yaml

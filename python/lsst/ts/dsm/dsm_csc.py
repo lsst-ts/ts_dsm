@@ -218,7 +218,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         """Handle things that depend on state.
         """
         self.log.debug(f"Current state: {self.summary_state}")
-        if self.summary_state in (salobj.State.DISABLED, salobj.State.ENABLED):
+        if self.disabled_or_enabled:
             if self.telemetry_loop_task.done():
                 self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
 

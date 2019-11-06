@@ -110,8 +110,8 @@ class DSMCSC(salobj.ConfigurableCsc):
         if self.telemetry_directory is None and not self.simulation_mode:
             self.telemetry_directory = self.config.telemetry_directory
 
-        self.evt_settingsApplied.set_put(telemetryDirectory=self.telemetry_directory,
-                                         simulationLoopTime=self.simulation_loop_time)
+        self.evt_settingsAppliedSetup.set_put(telemetryDirectory=self.telemetry_directory,
+                                              simulationLoopTime=self.simulation_loop_time)
 
     @staticmethod
     def get_config_pkg():

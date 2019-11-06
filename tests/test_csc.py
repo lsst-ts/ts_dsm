@@ -180,8 +180,8 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(harness.csc.summary_state, salobj.State.DISABLED)
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=STD_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.DISABLED)
-                settings_applied = await harness.remote.evt_settingsApplied.next(flush=False,
-                                                                                 timeout=STD_TIMEOUT)
+                settings_applied = await harness.remote.evt_settingsAppliedSetup.next(flush=False,
+                                                                                      timeout=STD_TIMEOUT)
                 self.assertTrue(settings_applied.telemetryDirectory.startswith('/tmp'))
                 self.assertEqual(settings_applied.simulationLoopTime, 1)
                 self.assertTrue(harness.csc.telemetry_directory.startswith('/tmp'))

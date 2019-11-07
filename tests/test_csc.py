@@ -146,7 +146,7 @@ class TestDSMCSC(unittest.TestCase):
                 # Telemetry loop should no longer be running
                 self.assertTrue(harness.csc.telemetry_loop_task.done())
 
-        asyncio.get_event_loop().run_until_complete(doit())
+        asyncio.run(doit())
 
     def test_default_config_dir(self):
         async def doit():
@@ -161,7 +161,7 @@ class TestDSMCSC(unittest.TestCase):
                 self.assertEqual(harness.csc.config_dir, desired_config_dir)
                 self.telemetry_directory = harness.csc.telemetry_directory
 
-        asyncio.get_event_loop().run_until_complete(doit())
+        asyncio.run(doit())
 
     def test_configuration(self):
         async def doit():
@@ -193,7 +193,7 @@ class TestDSMCSC(unittest.TestCase):
                 state = await harness.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
                 self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
-        asyncio.get_event_loop().run_until_complete(doit())
+        asyncio.run(doit())
 
 
 if __name__ == '__main__':

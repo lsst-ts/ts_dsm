@@ -22,7 +22,7 @@ async def shutdown(opts):
 
 def main(opts):
 
-    asyncio.get_event_loop().run_until_complete(shutdown(opts))
+    asyncio.run(shutdown(opts))
 
 
 if __name__ == '__main__':

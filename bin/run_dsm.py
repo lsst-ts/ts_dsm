@@ -13,13 +13,11 @@ async def go_to_enabled(csc_domain, options):
     await salobj.set_summary_state(remote, salobj.State.ENABLED, settingsToApply="default")
 
 
-def main(opts):
+async def main(opts):
 
     csc = dsm_csc.DSMCSC(index=opts.index, initial_simulation_mode=opts.mode)
 
-    asyncio.get_event_loop().run_until_complete(asyncio.gather(csc.done_task,
-                                                               go_to_enabled(csc.domain,
-                                                                             opts)))
+    await asyncio.gather(csc.done_task, go_to_enabled(csc.domain, opts))
 
 
 if __name__ == '__main__':
@@ -34,4 +32,4 @@ if __name__ == '__main__':
     parser.set_defaults(mode=0)
     args = parser.parse_args()
 
-    main(args)
+    asyncio.run(main(args))

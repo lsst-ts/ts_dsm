@@ -112,7 +112,7 @@ class DSMCSC(salobj.ConfigurableCsc):
                 self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)
                 loop = asyncio.get_running_loop()
                 await self.telemetry_watcher.setup(loop)
-            except ValueError:
+            except (AssertionError, ValueError):
                 # Watch already running
                 pass
 

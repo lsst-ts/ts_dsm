@@ -58,28 +58,6 @@ class DSMCSC(salobj.ConfigurableCsc):
         ch = logging.StreamHandler()
         self.log.addHandler(ch)
 
-    async def begin_start(self, id_data):
-        """Begin do_start; called after state changes but before command
-           acknowledged.
-
-        This method will create the telemetry directory if in simulation mode
-        and the directory has not been specified previously.
-
-        Parameters
-        ----------
-        id_data : `CommandIdData`
-            Command ID and data
-        """
-        await super().begin_start(id_data)
-        self.log.debug(f"Telemetry dir: {self.telemetry_directory}")
-        try:
-            self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)
-            loop = asyncio.get_running_loop()
-            await self.telemetry_watcher.setup(loop)
-        except ValueError:
-            # Watch already running
-            pass
-
     def cleanup_simulation(self):
         """Remove all generated files and directory from simulation
         """
@@ -110,8 +88,8 @@ class DSMCSC(salobj.ConfigurableCsc):
         if self.telemetry_directory is None and not self.simulation_mode:
             self.telemetry_directory = self.config.telemetry_directory
 
-        self.evt_settingsApplied.set_put(telemetryDirectory=self.telemetry_directory,
-                                         simulationLoopTime=self.simulation_loop_time)
+        self.evt_settingsAppliedSetup.set_put(telemetryDirectory=self.telemetry_directory,
+                                              simulationLoopTime=self.simulation_loop_time)
 
     @staticmethod
     def get_config_pkg():
@@ -123,6 +101,36 @@ class DSMCSC(salobj.ConfigurableCsc):
             The configuration repository / directory.
         """
         return "ts_config_eas"
+
+    async def handle_summary_state(self):
+        """Handle things that depend on state.
+        """
+        self.log.debug(f"Current state: {self.summary_state}")
+        if self.disabled_or_enabled:
+            self.log.debug(f"Telemetry dir: {self.telemetry_directory}")
+            try:
+                self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)
+                loop = asyncio.get_running_loop()
+                await self.telemetry_watcher.setup(loop)
+            except (AssertionError, ValueError):
+                # Watch already running
+                pass
+
+            if self.telemetry_loop_task.done():
+                self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
+
+            if self.simulation_mode and self.simulated_telemetry_loop_task.done():
+                self.simulated_telemetry_loop_task = asyncio.create_task(self.simulated_telemetry_loop())
+        else:
+            if self.simulation_mode:
+                self.simulated_telemetry_loop_task.cancel()
+                self.simulated_telemetry_ui_config_written = False
+                self.cleanup_simulation()
+
+            self.telemetry_loop_task.cancel()
+            if not self.telemetry_watcher.closed:
+                self.telemetry_watcher.unwatch(self.telemetry_directory)
+                self.telemetry_watcher.close()
 
     async def implement_simulation_mode(self, simulation_mode):
         """Setup items related to simulation mode.
@@ -213,29 +221,6 @@ class DSMCSC(salobj.ConfigurableCsc):
                                            cameraFps=content['camera']['fps'],
                                            dataBufferSize=content['data']['buffer_size'],
                                            dataAcquisitionTime=content['data']['acquisition_time'])
-
-    def report_summary_state(self):
-        """Handle things that depend on state.
-        """
-        self.log.debug(f"Current state: {self.summary_state}")
-        if self.summary_state in (salobj.State.DISABLED, salobj.State.ENABLED):
-            if self.telemetry_loop_task.done():
-                self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
-
-            if self.simulation_mode and self.simulated_telemetry_loop_task.done():
-                self.simulated_telemetry_loop_task = asyncio.create_task(self.simulated_telemetry_loop())
-        else:
-            if self.simulation_mode:
-                self.simulated_telemetry_loop_task.cancel()
-                self.simulated_telemetry_ui_config_written = False
-                self.cleanup_simulation()
-
-            self.telemetry_loop_task.cancel()
-            if not self.telemetry_watcher.closed:
-                self.telemetry_watcher.unwatch(self.telemetry_directory)
-                self.telemetry_watcher.close()
-
-        super().report_summary_state()
 
     async def simulated_telemetry_loop(self):
         """Run the simulated telemetry loop.

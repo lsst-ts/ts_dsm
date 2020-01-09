@@ -66,8 +66,14 @@ def create_telemetry_data(output_dir):
     now = Time.now()
     first = now - TimeDelta(25, format='sec')
     rms_roi = np.random.random()
+    centroidX = 214 + 3 * np.random.random()
+    centroidY = 320 + 3 * np.random.random()
+    flux = 2000 + 100 * np.random.random()
+    maxADC = 1000 + 100 * np.random.random()
+    fwhm = 6 + np.random.random()
 
-    output = [now.isot, first.isot, now.isot, rms_roi, rms_roi]
+    output = [now.isot, first.isot, now.isot, rms_roi, rms_roi,
+              centroidX, centroidY, flux, maxADC, fwhm]
 
     telemetry_file = 'dsm_{}.dat'.format(now.strftime('%Y%m%d_%H%M%S'))
     with open(os.path.join(output_dir, telemetry_file), 'w') as csv_file:

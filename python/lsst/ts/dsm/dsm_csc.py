@@ -181,7 +181,12 @@ class DSMCSC(salobj.ConfigurableCsc):
                                                 timestampFirstMeasurement=utils.convert_time(row[1]),
                                                 timestampLastMeasurement=utils.convert_time(row[2]),
                                                 rmsX=float(row[3]),
-                                                rmsY=float(row[4]))
+                                                rmsY=float(row[4]),
+                                                centroidX=float(row[5]),
+                                                centroidY=float(row[6]),
+                                                flux=float(row[7]),
+                                                maxADC=float(row[8]),
+                                                fwhm=float(row[9]))
                 except IndexError as error:
                     self.log.error(f"{ifile}: {error}")
 

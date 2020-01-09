@@ -106,6 +106,16 @@ class TestDSMCSC(asynctest.TestCase):
         self.assertGreater(dome_seeing.rmsY, 0)
         # Only for simulation!
         self.assertEqual(dome_seeing.rmsX, dome_seeing.rmsY)
+        self.assertIsInstance(dome_seeing.centroidX, float)
+        self.assertGreaterEqual(dome_seeing.centroidX, 215)
+        self.assertIsInstance(dome_seeing.centroidY, float)
+        self.assertGreaterEqual(dome_seeing.centroidY, 320)
+        self.assertIsInstance(dome_seeing.flux, float)
+        self.assertGreaterEqual(dome_seeing.flux, 2000)
+        self.assertIsInstance(dome_seeing.maxADC, float)
+        self.assertGreaterEqual(dome_seeing.maxADC, 1000)
+        self.assertIsInstance(dome_seeing.fwhm, float)
+        self.assertGreaterEqual(dome_seeing.fwhm, 6)
 
         # Move to ENABLED state
         await self.remote.cmd_enable.start(timeout=LONG_TIMEOUT)

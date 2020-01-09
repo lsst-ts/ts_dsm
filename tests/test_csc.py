@@ -46,7 +46,7 @@ class TestDSMCSC(asynctest.TestCase):
         self.index = 1
         self.csc = dsm_csc.DSMCSC(index=self.index, config_dir=config_dir,
                                   initial_state=initial_state,
-                                  initial_simulation_mode=1)
+                                  simulation_mode=1)
         self.remote = salobj.Remote(domain=self.csc.domain, name="DSM", index=self.index)
 
         await self.csc.start_task

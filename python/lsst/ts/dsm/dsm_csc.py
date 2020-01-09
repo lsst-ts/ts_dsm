@@ -26,7 +26,7 @@ class DSMCSC(salobj.ConfigurableCsc):
     """
 
     def __init__(self, index, config_dir=None, initial_state=salobj.State.STANDBY,
-                 initial_simulation_mode=0):
+                 simulation_mode=0):
         """
         Initialize DSM CSC.
 
@@ -38,7 +38,7 @@ class DSMCSC(salobj.ConfigurableCsc):
             The location of the CSC configuration files.
         initial_state : `lsst.ts.salobj.State`, optional
             State to place CSC in after initialization.
-        initial_simulation_mode : `int`, optional
+        simulation_mode : `int`, optional
             Flag to determine mode of operation.
         """
         schema_path = pathlib.Path(__file__).resolve().parents[4].joinpath("schema", "DSM.yaml")
@@ -53,7 +53,7 @@ class DSMCSC(salobj.ConfigurableCsc):
 
         super().__init__("DSM", index, schema_path=schema_path, config_dir=config_dir,
                          initial_state=initial_state,
-                         initial_simulation_mode=initial_simulation_mode)
+                         simulation_mode=simulation_mode)
 
         ch = logging.StreamHandler()
         self.log.addHandler(ch)

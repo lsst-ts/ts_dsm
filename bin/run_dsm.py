@@ -15,7 +15,7 @@ async def go_to_enabled(csc_domain, options):
 
 async def main(opts):
 
-    csc = dsm_csc.DSMCSC(index=opts.index, initial_simulation_mode=opts.mode)
+    csc = dsm_csc.DSMCSC(index=opts.index, simulation_mode=opts.mode)
 
     await asyncio.gather(csc.done_task, go_to_enabled(csc.domain, opts))
 

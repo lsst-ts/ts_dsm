@@ -18,7 +18,7 @@ setup(
     package_dir={"": "python"},
     packages=find_namespace_packages(where="python"),
     package_data={"": ["*.rst", "*.yaml"]},
-    scripts=["bin/run_dsm.py", "bin/resume_dsm.py", "bin/shutdown_dsm.py"],
+    scripts=["bin/run_dsm.py", "bin/shutdown_dsm.py"],
     tests_require=tests_require,
     extras_require={"dev": dev_requires},
     license="GPL"

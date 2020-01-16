@@ -5,5 +5,5 @@ properties:
   telemetry_directory:
     description: The directory where the DSM UI telemetry files are written.
     type: string
-    default: /home/saluser/develop/dsm_telemetry
+    default: /home/saluser/telemetry
 additionalProperties: false

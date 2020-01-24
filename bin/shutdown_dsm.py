@@ -16,7 +16,7 @@ async def shutdown(opts):
         remote = salobj.Remote(domain=domain, name="DSM", index=opts.index)
         for command in commands:
             cmd = getattr(remote, f'cmd_{command}')
-            await cmd.start(timeout=15)
+            await cmd.start(timeout=60)
     finally:
         await domain.close()
 

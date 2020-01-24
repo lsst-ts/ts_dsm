@@ -106,7 +106,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         """Handle things that depend on state.
         """
         self.log.debug(f"Current state: {self.summary_state}")
-        if self.disabled_or_enabled:
+        if self.summary_state is salobj.State.ENABLED:
             self.log.debug(f"Telemetry dir: {self.telemetry_directory}")
             try:
                 self.telemetry_watcher.watch(path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE)

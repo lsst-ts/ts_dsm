@@ -18,6 +18,7 @@ async def go_to_enabled(csc_domain, options):
             cmd.set(settingsToApply="default")
         await cmd.start(timeout=15)
 
+
 async def main(opts):
 
     csc = dsm_csc.DSMCSC(index=opts.index, simulation_mode=opts.mode)

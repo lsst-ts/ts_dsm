@@ -74,6 +74,15 @@ class TestDSMCSC(asynctest.TestCase):
         self.assertEqual(state.summaryState, salobj.State.DISABLED)
         self.telemetry_directory = self.csc.telemetry_directory
 
+        # Check that the telemetry loops aren't running yet.
+        self.assertTrue(self.csc.simulated_telemetry_loop_task.done())
+        self.assertTrue(self.csc.telemetry_loop_task.done())
+
+        # Move to ENABLED state
+        await self.remote.cmd_enable.start(timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        self.assertEqual(state.summaryState, salobj.State.ENABLED)
+
         # Check that the simulated telemetry loop is running
         self.assertIsNotNone(self.csc.telemetry_directory)
         self.assertTrue(os.path.exists(self.csc.telemetry_directory))
@@ -117,19 +126,6 @@ class TestDSMCSC(asynctest.TestCase):
         self.assertIsInstance(dome_seeing.fwhm, float)
         self.assertGreaterEqual(dome_seeing.fwhm, 6)
 
-        # Move to ENABLED state
-        await self.remote.cmd_enable.start(timeout=LONG_TIMEOUT)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
-        self.assertEqual(state.summaryState, salobj.State.ENABLED)
-
-        # Simulation loop should still be running
-        self.assertFalse(self.csc.simulated_telemetry_loop_task.done())
-        sim_files = len(list(os.listdir(self.csc.telemetry_directory)))
-        self.assertGreaterEqual(sim_files, 2)
-
-        # Telemetry loop should still be running
-        self.assertFalse(self.csc.telemetry_loop_task.done())
-
         await asyncio.sleep(1)
 
         # Move to DISABLED state
@@ -137,25 +133,15 @@ class TestDSMCSC(asynctest.TestCase):
         state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
         self.assertEqual(state.summaryState, salobj.State.DISABLED)
 
-        # Simulation loop should still be running
-        self.assertFalse(self.csc.simulated_telemetry_loop_task.done())
-        sim_files = len(list(os.listdir(self.csc.telemetry_directory)))
-        self.assertGreater(sim_files, 2)
-
-        # Telemetry loop should still be running
-        self.assertFalse(self.csc.telemetry_loop_task.done())
+        # Telemetry loops should stop running
+        self.assertTrue(self.csc.simulated_telemetry_loop_task.done())
+        self.assertTrue(self.csc.telemetry_loop_task.done())
+        self.assertFalse(self.csc.simulated_telemetry_ui_config_written)
 
         # Move to STANDBY state
         await self.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
         state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
         self.assertEqual(state.summaryState, salobj.State.STANDBY)
-
-        # Simulation loop should no longer be running
-        self.assertTrue(self.csc.simulated_telemetry_loop_task.done())
-        self.assertFalse(self.csc.simulated_telemetry_ui_config_written)
-
-        # Telemetry loop should no longer be running
-        self.assertTrue(self.csc.telemetry_loop_task.done())
 
     async def test_default_config_dir(self):
         await self.make_csc(initial_state=salobj.State.STANDBY)

@@ -2,7 +2,7 @@ ARG deploy_env_tag=salobj_v5.3.0_xml_v4.6.0
 
 FROM lsstts/deploy-env:${deploy_env_tag}
 
-ARG dsm_csc_branch=master
+ARG dsm_conda_version=1.1.0
 ARG dsm_config_branch=master
 
 RUN mkdir /home/saluser/telemetry
@@ -21,13 +21,9 @@ WORKDIR /home/saluser/repos/ts_config_eas
 
 RUN git fetch --all && git checkout ${dsm_config_branch}
 
-WORKDIR /home/saluser/repos/ts_dsm
-
-RUN git fetch --all && git checkout ${dsm_csc_branch}
-
 RUN source ~/miniconda3/bin/activate && \
     source $OSPL_HOME/release.com && \
-    pip install -e .
+    conda install -c lsstts ts_dsm=${dsm_conda_version}
 
 COPY setup.sh /home/saluser/.setup.sh
 COPY shutdown.sh /home/saluser/.shutdown.sh

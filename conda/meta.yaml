@@ -1,14 +1,13 @@
 {% set data= load_setup_py_data() %}
 package:
   name: ts-dsm
-  version: {{ environ.get('GIT_DESCRIBE_TAG', 'default')}}
+  version: {{ data.get('version') }}
 
 source:
   path: ../
 
 build:
-  script: python -m pip install --ignore-installed .
-  skip: True #[win]
+  script: python -m pip install --no-deps --ignore-installed .
   script_env:
     - PATH
     - PYTHONPATH
@@ -17,6 +16,7 @@ build:
     - PYTHON_BUILD_VERSION
     - PYTHON_BUILD_LOCATION
     - TS_CONFIG_EAS_DIR
+    - LSST_DDS_DOMAIN
 
 test:
   requires:
@@ -26,12 +26,13 @@ test:
     - asynctest
     - ts-dds
     - ts-salobj
-    - ts-idl==v1.1.2_4.7.0
+    - ts-idl
     - aionotify
     - pytz
   source_files:
     - bin
     - python
+    - schema
     - tests
     - setup.cfg
   commands:

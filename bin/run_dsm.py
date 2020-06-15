@@ -9,6 +9,7 @@ from lsst.ts.dsm import dsm_csc
 
 async def go_to_enabled(csc_domain, options):
     remote = salobj.Remote(domain=csc_domain, name="DSM", index=options.index)
+    await remote.start_task
     await remote.evt_heartbeat.next(flush=False, timeout=120)
 
     commands = ['start', 'enable']

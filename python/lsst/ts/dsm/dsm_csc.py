@@ -50,6 +50,7 @@ class DSMCSC(salobj.ConfigurableCsc):
         self.simulated_telemetry_loop_task = salobj.make_done_future()
         self.simulation_loop_time = None
         self.config = None
+        self.valid_simulation_modes = (0, 1, 2)
 
         super().__init__("DSM", index, schema_path=schema_path, config_dir=config_dir,
                          initial_state=initial_state,
@@ -145,8 +146,8 @@ class DSMCSC(salobj.ConfigurableCsc):
         `lsst.ts.salobj.ExpectedError`
             Warns user if correct simulation mode value is not provided.
         """
-        if simulation_mode not in (0, 1, 2):
-            raise salobj.ExpectedError(f"Simulation_mode={simulation_mode} must be 0, 1 or 2")
+        if simulation_mode not in self.valid_simulation_modes:
+            raise salobj.ExpectedError(f"Simulation_mode={simulation_mode} must be {self.valid_simulation_modes}")
 
         if self.simulation_mode == simulation_mode:
             return

@@ -22,7 +22,7 @@ TEST_CONFIG_DIR = pathlib.Path(__file__).parents[1].joinpath("tests", "data", "c
 class TestDSMCSC(asynctest.TestCase):
 
     def setUp(self):
-        salobj.test_utils.set_random_lsst_dds_domain()
+        salobj.test_utils.set_random_lsst_dds_partition_prefix()
         self.telemetry_directory = ""
         self.csc = None
         self.remote = None

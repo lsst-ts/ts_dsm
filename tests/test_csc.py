@@ -20,7 +20,6 @@ TEST_CONFIG_DIR = pathlib.Path(__file__).parents[1].joinpath("tests", "data", "c
 
 
 class TestDSMCSC(asynctest.TestCase):
-
     def setUp(self):
         salobj.test_utils.set_random_lsst_dds_partition_prefix()
         self.telemetry_directory = ""
@@ -44,10 +43,15 @@ class TestDSMCSC(asynctest.TestCase):
         """Make a DSM CSC and remote and wait for them to start.
         """
         self.index = 1
-        self.csc = dsm_csc.DSMCSC(index=self.index, config_dir=config_dir,
-                                  initial_state=initial_state,
-                                  simulation_mode=1)
-        self.remote = salobj.Remote(domain=self.csc.domain, name="DSM", index=self.index)
+        self.csc = dsm_csc.DSMCSC(
+            index=self.index,
+            config_dir=config_dir,
+            initial_state=initial_state,
+            simulation_mode=1,
+        )
+        self.remote = salobj.Remote(
+            domain=self.csc.domain, name="DSM", index=self.index
+        )
 
         await self.csc.start_task
         await self.remote.start_task
@@ -58,8 +62,12 @@ class TestDSMCSC(asynctest.TestCase):
         The emphasis for this test is making sure the telemetry loop can be
         started and stopped through the lifecycle commands.
         """
-        await self.make_csc(initial_state=salobj.State.STANDBY, config_dir=TEST_CONFIG_DIR)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        await self.make_csc(
+            initial_state=salobj.State.STANDBY, config_dir=TEST_CONFIG_DIR
+        )
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.STANDBY)
         self.assertEqual(self.csc.simulation_mode, 1)
         self.assertIsNotNone(self.csc.telemetry_directory)
@@ -68,9 +76,11 @@ class TestDSMCSC(asynctest.TestCase):
         self.assertIsNone(self.csc.config)
 
         # Move to DISABLED state
-        self.remote.cmd_start.set(settingsToApply='default')
+        self.remote.cmd_start.set(settingsToApply="default")
         await self.remote.cmd_start.start(timeout=LONG_TIMEOUT)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.DISABLED)
         self.telemetry_directory = self.csc.telemetry_directory
 
@@ -80,7 +90,9 @@ class TestDSMCSC(asynctest.TestCase):
 
         # Move to ENABLED state
         await self.remote.cmd_enable.start(timeout=LONG_TIMEOUT)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.ENABLED)
 
         # Check that the simulated telemetry loop is running
@@ -93,18 +105,24 @@ class TestDSMCSC(asynctest.TestCase):
 
         # Check that the telemetry loop is running
         self.assertFalse(self.csc.telemetry_loop_task.done())
-        configuration = await self.remote.tel_configuration.next(flush=False, timeout=LONG_TIMEOUT)
+        configuration = await self.remote.tel_configuration.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(configuration.dsmIndex, 1)
         self.assertGreater(configuration.timestampConfigStart, 0)
-        self.assertEqual(configuration.uiVersionCode, '1.0.1')
-        self.assertEqual(configuration.uiVersionConfig, '1.4.4')
-        self.assertEqual(configuration.uiConfigFile, 'file:///dsm/ui_dsm_config/default.yaml')
-        self.assertEqual(configuration.cameraName, 'Vimba')
+        self.assertEqual(configuration.uiVersionCode, "1.0.1")
+        self.assertEqual(configuration.uiVersionConfig, "1.4.4")
+        self.assertEqual(
+            configuration.uiConfigFile, "file:///dsm/ui_dsm_config/default.yaml"
+        )
+        self.assertEqual(configuration.cameraName, "Vimba")
         self.assertEqual(configuration.cameraFps, 40)
         self.assertEqual(configuration.dataBufferSize, 1024)
         self.assertEqual(configuration.dataAcquisitionTime, 25)
 
-        dome_seeing = await self.remote.tel_domeSeeing.next(flush=False, timeout=STD_TIMEOUT)
+        dome_seeing = await self.remote.tel_domeSeeing.next(
+            flush=False, timeout=STD_TIMEOUT
+        )
         self.assertEqual(dome_seeing.dsmIndex, 1)
         self.assertIsInstance(dome_seeing.timestampCurrent, float)
         self.assertIsInstance(dome_seeing.timestampFirstMeasurement, float)
@@ -130,7 +148,9 @@ class TestDSMCSC(asynctest.TestCase):
 
         # Move to DISABLED state
         await self.remote.cmd_disable.start(timeout=LONG_TIMEOUT)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.DISABLED)
 
         # Telemetry loops should stop running
@@ -140,7 +160,9 @@ class TestDSMCSC(asynctest.TestCase):
 
         # Move to STANDBY state
         await self.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
     async def test_default_config_dir(self):
@@ -156,34 +178,45 @@ class TestDSMCSC(asynctest.TestCase):
         self.telemetry_directory = self.csc.telemetry_directory
 
     async def test_configuration(self):
-        await self.make_csc(initial_state=salobj.State.STANDBY, config_dir=TEST_CONFIG_DIR)
+        await self.make_csc(
+            initial_state=salobj.State.STANDBY, config_dir=TEST_CONFIG_DIR
+        )
         self.assertEqual(self.csc.summary_state, salobj.State.STANDBY)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.STANDBY)
-        settings = await self.remote.evt_settingVersions.next(flush=False, timeout=LONG_TIMEOUT)
+        settings = await self.remote.evt_settingVersions.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         settings_labels = ("default", "alternate")
-        for label in settings.recommendedSettingsLabels.split(','):
+        for label in settings.recommendedSettingsLabels.split(","):
             self.assertTrue(label in settings_labels)
         self.assertEqual(settings.settingsUrl, TEST_CONFIG_DIR.as_uri())
 
         self.remote.cmd_start.set(settingsToApply="default")
         await self.remote.cmd_start.start(timeout=STD_TIMEOUT)
         self.assertEqual(self.csc.summary_state, salobj.State.DISABLED)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=STD_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=STD_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.DISABLED)
-        settings_applied = await self.remote.evt_settingsAppliedSetup.next(flush=False,
-                                                                           timeout=STD_TIMEOUT)
-        self.assertTrue(settings_applied.telemetryDirectory.startswith('/tmp'))
+        settings_applied = await self.remote.evt_settingsAppliedSetup.next(
+            flush=False, timeout=STD_TIMEOUT
+        )
+        self.assertTrue(settings_applied.telemetryDirectory.startswith("/tmp"))
         self.assertEqual(settings_applied.simulationLoopTime, 1)
-        self.assertTrue(self.csc.telemetry_directory.startswith('/tmp'))
+        self.assertTrue(self.csc.telemetry_directory.startswith("/tmp"))
         self.assertEqual(self.csc.simulation_loop_time, 1)
         self.telemetry_directory = self.csc.telemetry_directory
 
         # Return to STANDBY to shutdown loops
         await self.remote.cmd_standby.start(timeout=LONG_TIMEOUT)
-        state = await self.remote.evt_summaryState.next(flush=False, timeout=LONG_TIMEOUT)
+        state = await self.remote.evt_summaryState.next(
+            flush=False, timeout=LONG_TIMEOUT
+        )
         self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

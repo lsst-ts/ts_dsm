@@ -18,8 +18,10 @@ data_files_path = tools_path.relative_to(base_prefix).parents[1]
 setuptools.setup(
     name="ts_dsm",
     description="CSC for Dome Seeing Monitor.",
-    use_scm_version={"write_to": "python/lsst/ts/dsm/version.py",
-                     "write_to_template": scm_version_template},
+    use_scm_version={
+        "write_to": "python/lsst/ts/dsm/version.py",
+        "write_to_template": scm_version_template,
+    },
     setup_requires=["setuptools_scm", "pytest-runner"],
     install_requires=install_requires,
     package_dir={"": "python"},
@@ -33,5 +35,5 @@ setuptools.setup(
     project_urls={
         "Bug Tracker": "https://jira.lsstcorp.org/secure/Dashboard.jspa",
         "Source Code": "https://github.com/lsst-ts/ts_dsm",
-    }
+    },
 )

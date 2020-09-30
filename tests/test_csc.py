@@ -93,7 +93,7 @@ class TestDSMCSC(asynctest.TestCase):
 
         # Check that the telemetry loop is running
         self.assertFalse(self.csc.telemetry_loop_task.done())
-        configuration = await self.remote.tel_configuration.next(flush=True, timeout=LONG_TIMEOUT)
+        configuration = await self.remote.tel_configuration.next(flush=False, timeout=LONG_TIMEOUT)
         self.assertEqual(configuration.dsmIndex, 1)
         self.assertGreater(configuration.timestampConfigStart, 0)
         self.assertEqual(configuration.uiVersionCode, '1.0.1')
@@ -104,7 +104,7 @@ class TestDSMCSC(asynctest.TestCase):
         self.assertEqual(configuration.dataBufferSize, 1024)
         self.assertEqual(configuration.dataAcquisitionTime, 25)
 
-        dome_seeing = await self.remote.tel_domeSeeing.next(flush=True, timeout=STD_TIMEOUT)
+        dome_seeing = await self.remote.tel_domeSeeing.next(flush=False, timeout=STD_TIMEOUT)
         self.assertEqual(dome_seeing.dsmIndex, 1)
         self.assertIsInstance(dome_seeing.timestampCurrent, float)
         self.assertIsInstance(dome_seeing.timestampFirstMeasurement, float)

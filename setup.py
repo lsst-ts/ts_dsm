@@ -1,4 +1,3 @@
-import os
 import pathlib
 import setuptools
 import sys
@@ -27,7 +26,6 @@ setuptools.setup(
     package_dir={"": "python"},
     packages=setuptools.find_namespace_packages(where="python"),
     package_data={"": ["*.rst", "*.yaml"]},
-    data_files=[(os.path.join(data_files_path, "schema"), ["schema/DSM.yaml"])],
     scripts=["bin/run_dsm.py", "bin/shutdown_dsm.py"],
     tests_require=tests_require,
     extras_require={"dev": dev_requires},

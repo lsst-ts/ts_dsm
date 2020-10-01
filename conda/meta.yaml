@@ -15,8 +15,7 @@ build:
     - OSPL_HOME
     - PYTHON_BUILD_VERSION
     - PYTHON_BUILD_LOCATION
-    - TS_CONFIG_EAS_DIR
-    - LSST_DDS_DOMAIN
+    - LSST_DDS_PARTICIPANT_PREFIX
 
 test:
   requires:
@@ -32,7 +31,6 @@ test:
   source_files:
     - bin
     - python
-    - schema
     - tests
     - setup.cfg
   commands:

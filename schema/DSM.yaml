@@ -1,9 +1,0 @@
-title: DSM v1
-description: Schema for DSM configuration files
-type: object
-properties:
-  telemetry_directory:
-    description: The directory where the DSM UI telemetry files are written.
-    type: string
-    default: /home/saluser/telemetry
-additionalProperties: false

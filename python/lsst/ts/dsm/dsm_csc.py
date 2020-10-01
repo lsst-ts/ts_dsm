@@ -20,7 +20,7 @@ FAST_SIMULATION = 1  # second
 SLOW_SIMULATION = 30  # seconds
 
 
-class DSMCSC(salobj.ConfigurableCsc):
+class DSMCSC(salobj.BaseCsc):
     """
     Commandable SAL Component to interface with the LSST DSMs.
     """
@@ -28,7 +28,6 @@ class DSMCSC(salobj.ConfigurableCsc):
     def __init__(
         self,
         index,
-        config_dir=None,
         initial_state=salobj.State.STANDBY,
         simulation_mode=0,
     ):
@@ -39,16 +38,11 @@ class DSMCSC(salobj.ConfigurableCsc):
         ----------
         index : `int`
             Index for the DSM. This enables the control of multiple DSMs.
-        config_dir : `str`, optional
-            The location of the CSC configuration files.
         initial_state : `lsst.ts.salobj.State`, optional
             State to place CSC in after initialization.
         simulation_mode : `int`, optional
             Flag to determine mode of operation.
         """
-        schema_path = (
-            pathlib.Path(__file__).resolve().parents[4].joinpath("schema", "DSM.yaml")
-        )
 
         self.telemetry_directory = None
         self.telemetry_loop_task = salobj.make_done_future()
@@ -56,14 +50,11 @@ class DSMCSC(salobj.ConfigurableCsc):
         self.simulated_telemetry_ui_config_written = False
         self.simulated_telemetry_loop_task = salobj.make_done_future()
         self.simulation_loop_time = None
-        self.config = None
         self.valid_simulation_modes = (0, 1, 2)
 
         super().__init__(
             "DSM",
             index,
-            schema_path=schema_path,
-            config_dir=config_dir,
             initial_state=initial_state,
             simulation_mode=simulation_mode,
         )
@@ -88,34 +79,6 @@ class DSMCSC(salobj.ConfigurableCsc):
                 shutil.rmtree(self.telemetry_directory)
 
         await super().close_tasks()
-
-    async def configure(self, config):
-        """Send settingsApplied messages.
-
-        Parameters
-        ----------
-        config : `types.SimpleNamespace`
-            The current configuration.
-        """
-        self.config = config
-        if self.telemetry_directory is None and not self.simulation_mode:
-            self.telemetry_directory = self.config.telemetry_directory
-
-        self.evt_settingsAppliedSetup.set_put(
-            telemetryDirectory=self.telemetry_directory,
-            simulationLoopTime=self.simulation_loop_time,
-        )
-
-    @staticmethod
-    def get_config_pkg():
-        """Provide the configuration repository / directory.
-
-        Returns
-        -------
-        `str`
-            The configuration repository / directory.
-        """
-        return "ts_config_eas"
 
     async def handle_summary_state(self):
         """Handle things that depend on state.

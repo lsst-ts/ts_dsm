@@ -5,6 +5,7 @@ import unittest
 
 import asynctest
 import numpy as np
+import pytest
 
 from lsst.ts import salobj
 from lsst.ts.dsm import dsm_csc
@@ -37,14 +38,14 @@ class TestDSMCSC(asynctest.TestCase):
         if os.path.exists(directory):
             shutil.rmtree(directory)
 
-    async def make_csc(self, initial_state):
+    async def make_csc(self, initial_state, simulation_mode=1):
         """Make a DSM CSC and remote and wait for them to start.
         """
         self.index = 1
         self.csc = dsm_csc.DSMCSC(
             index=self.index,
             initial_state=initial_state,
-            simulation_mode=1,
+            simulation_mode=simulation_mode,
         )
         self.remote = salobj.Remote(
             domain=self.csc.domain, name="DSM", index=self.index
@@ -59,9 +60,7 @@ class TestDSMCSC(asynctest.TestCase):
         The emphasis for this test is making sure the telemetry loop can be
         started and stopped through the lifecycle commands.
         """
-        await self.make_csc(
-            initial_state=salobj.State.STANDBY
-        )
+        await self.make_csc(initial_state=salobj.State.STANDBY)
         state = await self.remote.evt_summaryState.next(
             flush=False, timeout=LONG_TIMEOUT
         )
@@ -110,10 +109,10 @@ class TestDSMCSC(asynctest.TestCase):
         self.assertEqual(
             configuration.uiConfigFile, "file:///dsm/ui_dsm_config/default.yaml"
         )
-        self.assertEqual(configuration.cameraName, "Vimba")
-        self.assertEqual(configuration.cameraFps, 40)
-        self.assertEqual(configuration.dataBufferSize, 1024)
-        self.assertEqual(configuration.dataAcquisitionTime, 25)
+        self.assertEqual(configuration.cameraName, "Sim_Camera")
+        self.assertEqual(configuration.cameraFps, 120)
+        self.assertEqual(configuration.dataBufferSize, 128)
+        self.assertEqual(configuration.dataAcquisitionTime, 1)
 
         dome_seeing = await self.remote.tel_domeSeeing.next(
             flush=False, timeout=STD_TIMEOUT
@@ -159,6 +158,12 @@ class TestDSMCSC(asynctest.TestCase):
             flush=False, timeout=LONG_TIMEOUT
         )
         self.assertEqual(state.summaryState, salobj.State.STANDBY)
+
+    async def test_bad_simulation_mode(self):
+        """Test to ensure bad simulation modes raise
+        """
+        with pytest.raises(ValueError):
+            await self.make_csc(initial_state=salobj.State.STANDBY, simulation_mode=3)
 
 
 if __name__ == "__main__":

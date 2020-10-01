@@ -27,21 +27,27 @@ def convert_time(in_time):
     return ptime.tai.datetime.replace(tzinfo=pytz.utc).timestamp()
 
 
-def create_telemetry_config(output_dir):
+def create_telemetry_config(output_dir, sim_loop_time):
     """Create the DSM UI Configuration file for simulation mode.
 
     Parameters
     ----------
     output_dir : `str`
         Directory to write the telemetry UI configuration file.
+    sim_loop_time : in or float
+        Description
     """
     ui_version = "1.0.1"
     ui_config_version = "1.4.4"
     ui_config_file = "/dsm/ui_dsm_config/default.yaml"
-    camera_name = "Vimba"
-    camera_fps = 40
-    data_buffer_size = 1024
-    data_acquisition_time = 25
+    camera_name = "Sim_Camera"
+    if sim_loop_time > 1:
+        camera_fps = 40
+        data_buffer_size = 1024
+    else:
+        camera_fps = 120
+        data_buffer_size = 128
+    data_acquisition_time = sim_loop_time
 
     content = {
         "timestamp": Time.now().isot,
@@ -62,7 +68,7 @@ def create_telemetry_config(output_dir):
         yaml.dump(content, ofile)
 
 
-def create_telemetry_data(output_dir):
+def create_telemetry_data(output_dir, sim_loop_time):
     """
     Parameters
     ----------
@@ -70,7 +76,7 @@ def create_telemetry_data(output_dir):
         Directory to write the telemetry data file.
     """
     now = Time.now()
-    first = now - TimeDelta(25, format="sec")
+    first = now - TimeDelta(sim_loop_time, format="sec")
     rms_roi = np.random.random()
     centroidX = 214 + 3 * np.random.random()
     centroidY = 320 + 3 * np.random.random()

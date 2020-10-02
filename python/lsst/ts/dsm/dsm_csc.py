@@ -12,7 +12,7 @@ import aionotify
 from lsst.ts import salobj
 
 from . import utils
-from . import version
+from lsst.ts.dsm import __version__
 
 __all__ = ["DSMCSC"]
 
@@ -56,7 +56,7 @@ class DSMCSC(salobj.BaseCsc):
         ch = logging.StreamHandler()
         self.log.addHandler(ch)
 
-        self.evt_softwareVersions.set(cscVersion=version.__version__)
+        self.evt_softwareVersions.set(cscVersion=__version__)
         self.finish_csc_setup()
 
     def cleanup_simulation(self):

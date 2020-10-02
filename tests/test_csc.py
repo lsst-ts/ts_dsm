@@ -20,7 +20,7 @@ LONG_TIMEOUT = 20  # timeout for starting SAL components (sec)
 
 class TestDSMCSC(asynctest.TestCase):
     def setUp(self):
-        salobj.test_utils.set_random_lsst_dds_partition_prefix()
+        salobj.testutils.set_random_lsst_dds_partition_prefix()
         self.telemetry_directory = ""
         self.csc = None
         self.remote = None

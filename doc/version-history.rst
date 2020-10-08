@@ -1,17 +1,27 @@
-.. _Version_History:
+.... _Version_History:
 
 ===============
 Version History
 ===============
 
-.. At the time of writing the Version history/release notes are not yet standardized amongst CSCs.
-.. Until then, it is not expected that both a version history and a release_notes be maintained.
-.. It is expected that each CSC link to whatever method of tracking is being used for that CSC until standardization occurs.
-.. No new work should be required in order to complete this section.
-.. Below is an example of a version history format.
-
-v0.4.1
+v2.0.0
 ------
-* Added Jenkinsfile for conda recipe
-* Added conda recipe
-* Incorporated new offset parameters with the option of them being persistent (sticky)
+* Update to SALOBJ6 including upcoming deprecations
+* Convert back to non-configurable CSC
+* Add CSC documentation
+
+v1.1.2
+------
+* Update conda package building
+
+v1.1.1
+------
+* Address minor issues
+
+v1.1.0
+------
+* Update to SALOBJ5 code base
+
+v1.0.0
+------
+* Fully functional version

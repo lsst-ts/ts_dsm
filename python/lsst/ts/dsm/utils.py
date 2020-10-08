@@ -69,7 +69,8 @@ def create_telemetry_config(output_dir, sim_loop_time):
 
 
 def create_telemetry_data(output_dir, sim_loop_time):
-    """
+    """Create the DSM UI telemetry file for simulation mode.
+
     Parameters
     ----------
     output_dir : `str`

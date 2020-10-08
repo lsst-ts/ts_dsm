@@ -55,20 +55,15 @@ DSM
 .. image:: https://img.shields.io/badge/Jenkins-gray.svg
     :target: https://tssw-ci.lsst.org/job/LSST_Telescope-and-Site/job/ts_dsm/
 
-.. TODO: Delete the note when the page becomes populated
-
-.. Warning::
-
-   **This CSC documentation is under development and not ready for active use.**
-
 .. _Overview:
 
 Overview
 ========
 
-[This section is to present an overview of the CSC.
-This should include a top-level description of the primary use-case(s) as well as any pertinent information.
-Example information may be link(s) to the higher-level classes which may be used to operate it, or mention of other CSCs (with links) that it operates in concert with.]
+The Dome Seeing Monitor (DSM) CSC is responsible for taking output telemetry
+files from the Dome Seeing Monitor UI (need doc link) and sending the information via SAL
+for recording in the EFD. Although the DSM is part of the Environmental Awareness
+System, it currently runs stand-alone and is not tied in to the EAS in any manner.
 
 As with all CSCs, information on the package, developers and product owners can be found in the `Master CSC Table <ts_xml:index:master-csc-table:DSM>`_.
 
@@ -80,11 +75,6 @@ As with all CSCs, information on the package, developers and product owners can 
 User Documentation
 ==================
 
-.. This template has the user documentation in a subfolder.
-.. However, in cases where the user documentation is extremely short (<50 lines), one may move that content here and remove the subfolder.
-.. This will require modification of the heading styles and possibly renaming of the labels.
-.. If the content becomes too large, then it must be moved back to a subfolder and reformatted appropriately.
-
 User-level documentation, found at the link below, is aimed at personnel looking to perform the standard use-cases/operations with the DSM.
 
 .. toctree::
@@ -95,25 +85,14 @@ User-level documentation, found at the link below, is aimed at personnel looking
 
 Configuring the DSM
 =========================================
-.. For CSCs where configuration is not required, this section can contain a single sentence stating so.
-   More introductory information can also be added here (e.g. CSC XYZ requires both a configuration file containing parameters as well as several look-up tables to be operational).
 
-The configuration for the DSM is described at the following link.
-
-.. toctree::
-    configuration/configuration
-    :maxdepth: 1
-
+The DSM is a non-configurable CSC. There is one minor exception and is only used
+in development. The exception will be discussed there.
 
 .. _Development_Documentation:
 
 Development Documentation
 =========================
-
-.. This template has the user documentation in a subfolder.
-.. However, in cases where the user documentation is extremely short (<50 lines), one may move that content here and remove the subfolder.
-.. This will require modification of the heading styles and possibly renaming of the labels.
-.. If the content becomes too large, then it must be moved back to a subfolder and reformatted appropriately.
 
 This area of documentation focuses on the classes used, API's, and how to participate to the development of the DSM software packages.
 
@@ -125,11 +104,6 @@ This area of documentation focuses on the classes used, API's, and how to partic
 
 Version History
 ===============
-
-.. At the time of writing the Version history/release notes are not yet standardized amongst CSCs.
-.. Until then, it is not expected that both a version history and a release_notes be maintained.
-.. It is expected that each CSC link to whatever method of tracking is being used for that CSC until standardization occurs.
-.. No new work should be required in order to complete this section.
 
 The version history of the DSM is found at the following link.
 

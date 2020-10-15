@@ -1,51 +1,10 @@
-..
-  This is a template for documentation that will accompany each CSC.
-  It consists of a user guide and development guide, however, cross linking between the guides is expected.
-  This template is provided to ensure that the documentation remains similar in look, feel, and contents to users.
-  The headings below are expected to be present for all CSCs, but for many CSCs, additional fields will be required.
-  An example case can be found at https://ts-athexapod.lsst.io/v/develop/
-
-  ** All text in square brackets [] must be re-populated accordingly **
-
-  See https://developer.lsst.io/restructuredtext/style.html
-  for a guide to reStructuredText writing.
-
-  Use the following syntax for sections:
-
-  Sections
-  ========
-
-  and
-
-  Subsections
-  -----------
-
-  and
-
-  Subsubsections
-  ^^^^^^^^^^^^^^
-
-  To add images, add the image file (png, svg or jpeg preferred) to the
-  images/ directory. The reST syntax for adding the image is
-
-  .. figure:: /images/filename.ext
-   :name: fig-label
-
-  Caption text.
-
-  Feel free to delete this instructional comment.
-
-.. Fill out data so contacts section below is auto-populated
-.. |CSC_developer| replace::  *Replace-with-name-and-email*
-.. |CSC_product_owner| replace:: *Replace-with-name-and-email*
-
-.. Note that the "ts_" prefix is omitted from the title
+.. |Michael Reuter| replace::  *mareuter@lsst.org*
+.. |Brian Stalder| replace:: *bstalder@lsst.org*
 
 #########################
 DSM
 #########################
 
-.. update the following links to point to your CSC
 .. image:: https://img.shields.io/badge/SAL-API-gray.svg
     :target: https://ts-xml.lsst.io/sal_interfaces/DSM.html
 .. image:: https://img.shields.io/badge/GitHub-gray.svg

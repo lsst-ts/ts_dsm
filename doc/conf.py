@@ -5,10 +5,7 @@ import lsst.ts.dsm
 
 
 _g = globals()
-_g.update(
-    build_package_configs(
-        project_name="ts_dsm", version=lsst.ts.dsm.version.__version__
-    )
-)
+_g.update(build_package_configs(project_name="ts_dsm", version=lsst.ts.dsm.__version__))
 
-intersphinx_mapping["ts_xml"] = ("https://ts-xml.lsst.io", None)
+intersphinx_mapping["ts_xml"] = ("https://ts-xml.lsst.io", None)  # noqa
+intersphinx_mapping["ts_salobj"] = ("https://ts-salobj.lsst.io", None)  # noqa

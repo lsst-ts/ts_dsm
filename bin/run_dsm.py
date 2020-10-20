@@ -11,11 +11,7 @@ async def go_to_enabled(csc_domain, options):
     remote = salobj.Remote(domain=csc_domain, name="DSM", index=options.index)
     await remote.start_task
     await remote.evt_heartbeat.next(flush=False, timeout=120)
-
-    commands = ["start", "enable"]
-    for command in commands:
-        cmd = getattr(remote, f"cmd_{command}")
-        await cmd.start(timeout=15)
+    await salobj.set_summary_state(remote, salobj.State.ENABLED)
 
 
 async def main(opts):

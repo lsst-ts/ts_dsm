@@ -7,17 +7,16 @@ from lsst.ts import salobj
 
 
 async def shutdown(opts):
-    commands = ["disable", "standby", "exitControl"]
-    if not opts.full:
-        del commands[-1]
+    if opts.full:
+        end_state = salobj.State.OFFLINE
+    else:
+        end_state = salobj.State.STANDBY
 
     domain = salobj.Domain()
     try:
         remote = salobj.Remote(domain=domain, name="DSM", index=opts.index)
         await remote.start_task
-        for command in commands:
-            cmd = getattr(remote, f"cmd_{command}")
-            await cmd.start(timeout=60)
+        await salobj.set_summary_state(remote, end_state)
     finally:
         await domain.close()
 

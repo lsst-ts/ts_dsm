@@ -20,7 +20,7 @@ Overview
 ========
 
 The Dome Seeing Monitor (DSM) CSC is responsible for taking output telemetry
-files from the Dome Seeing Monitor UI (need doc link) and sending the information via SAL
+files from the Dome Seeing Monitor UI and sending the information via SAL
 for recording in the EFD. Although the DSM is part of the Environmental Awareness
 System, it currently runs stand-alone and is not tied in to the EAS in any manner.
 
@@ -45,8 +45,7 @@ User-level documentation, found at the link below, is aimed at personnel looking
 Configuring the DSM
 =========================================
 
-The DSM is a non-configurable CSC. There is one minor exception and is only used
-in development. The exception will be discussed there.
+The DSM is a non-configurable CSC.
 
 .. _Development_Documentation:
 

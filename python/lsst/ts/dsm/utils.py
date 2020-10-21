@@ -49,19 +49,16 @@ def create_telemetry_config(output_dir, sim_loop_time):
         data_buffer_size = 128
     data_acquisition_time = sim_loop_time
 
-    content = {
-        "timestamp": Time.now().isot,
-        "ui_versions": {
-            "code": ui_version,
-            "config": ui_config_version,
-            "config_file": ui_config_file,
-        },
-        "camera": {"name": camera_name, "fps": camera_fps},
-        "data": {
-            "buffer_size": data_buffer_size,
-            "acquisition_time": data_acquisition_time,
-        },
-    }
+    content = dict(
+        timestamp=Time.now().isot,
+        ui_versions=dict(
+            code=ui_version, config=ui_config_version, config_file=ui_config_file,
+        ),
+        camera=dict(name=camera_name, fps=camera_fps),
+        data=dict(
+            buffer_size=data_buffer_size, acquisition_time=data_acquisition_time,
+        ),
+    )
 
     filename = os.path.join(output_dir, "dsm_ui_config.yaml")
     with open(filename, "w") as ofile:

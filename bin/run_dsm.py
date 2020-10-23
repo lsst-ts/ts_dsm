@@ -16,7 +16,7 @@ async def go_to_enabled(csc_domain, options):
 
 async def main(opts):
 
-    csc = dsm_csc.DSMCSC(index=opts.index, simulation_mode=opts.mode)
+    csc = dsm_csc.DSMCSC(index=opts.index, simulation_mode=opts.simulate)
 
     await asyncio.gather(csc.done_task, go_to_enabled(csc.domain, opts))
 
@@ -32,24 +32,14 @@ if __name__ == "__main__":
         default=1,
         help="SAL index; use the default value unless you sure you know what you are doing",
     )
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "-f",
-        "--fast",
-        dest="mode",
-        action="store_const",
-        const=1,
-        help="Run CSC in fast (1 sec) telemetry simulation mode",
+    parser.add_argument(
+        "--simulate",
+        dest="simulate",
+        choices=[0, 1, 2],
+        type=int,
+        default=0,
+        help="Set the operation mode: 0 (real), 1 (fast sim, 1 sec), 2 (slow sim, 30 sec)",
     )
-    group.add_argument(
-        "-s",
-        "--slow",
-        dest="mode",
-        action="store_const",
-        const=2,
-        help="Run CSC in slow (30 sec) telemetry simulation mode",
-    )
-    parser.set_defaults(mode=0)
     args = parser.parse_args()
 
     asyncio.run(main(args))

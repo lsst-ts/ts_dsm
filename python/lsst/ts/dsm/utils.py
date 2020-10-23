@@ -34,8 +34,8 @@ def create_telemetry_config(output_dir, sim_loop_time):
     ----------
     output_dir : `str`
         Directory to write the telemetry UI configuration file.
-    sim_loop_time : in or float
-        Description
+    sim_loop_time : `int` or `float`
+        The time in seconds between successive telemetry file generations.
     """
     ui_version = "1.0.1"
     ui_config_version = "1.4.4"

@@ -18,6 +18,10 @@ __all__ = ["DSMCSC"]
 
 SIMULATION_LOOP_TIMES = [0, 1, 30]  # seconds
 
+# Default telemetry directory if running in real mode and $DSM_TELEMETRY_DIR
+# is not defined
+DEFAULT_DSM_TELEMETRY_DIR = "/home/saluser/telemetry"
+
 
 class DSMCSC(salobj.BaseCsc):
     """
@@ -90,9 +94,9 @@ class DSMCSC(salobj.BaseCsc):
                     f"Creating temporary directory: {self.telemetry_directory}"
                 )
         else:
-            self.telemetry_directory = os.environ.get("DSM_TELEMETRY_DIR")
-            if self.telemetry_directory is None:
-                self.telemetry_directory = "/home/saluser/telemetry"
+            self.telemetry_directory = os.environ.get(
+                "DSM_TELEMETRY_DIR", DEFAULT_DSM_TELEMETRY_DIR
+            )
 
         self.simulation_loop_time = SIMULATION_LOOP_TIMES[
             self._requested_simulation_mode

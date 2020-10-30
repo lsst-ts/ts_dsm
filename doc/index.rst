@@ -1,9 +1,13 @@
+.. py:currentmodule:: lsst.ts.DSM
+
 .. |Michael Reuter| replace::  *mareuter@lsst.org*
 .. |Brian Stalder| replace:: *bstalder@lsst.org*
 
-#########################
-DSM
-#########################
+.. _lsst.ts.DSM:
+
+###########
+lsst.ts.DSM
+###########
 
 .. image:: https://img.shields.io/badge/SAL-API-gray.svg
     :target: https://ts-xml.lsst.io/sal_interfaces/DSM.html
@@ -14,7 +18,7 @@ DSM
 .. image:: https://img.shields.io/badge/Jenkins-gray.svg
     :target: https://tssw-ci.lsst.org/job/LSST_Telescope-and-Site/job/ts_dsm/
 
-.. _Overview:
+.. _lsst.ts.DSM.overview:
 
 Overview
 ========
@@ -29,36 +33,80 @@ As with all CSCs, information on the package, developers and product owners can 
 .. note:: If you are interested in viewing other branches of this repository append a `/v` to the end of the url link. For example `https://ts_dsm.lsst.io/v/`
 
 
-.. _User_Documentation:
+.. _lsst.ts.DSM.user_guide:
 
-User Documentation
-==================
+User Guide
+==========
 
-User-level documentation, found at the link below, is aimed at personnel looking to perform the standard use-cases/operations with the DSM.
+The DSM CSC is a support CSC that is used in conjunction with the DSM UI in order
+to produce seeing measurements along the DSM probes line of sight. The functionality to produce these measurements are contained within the UI and are not described in this
+document. The UI is also responsible for the interaction with the DSM probe hardware. 
+The operational interaction of these systems and other details are captured in `SITCOMTN-001 <https://sitcomtn-001.lsst.io/>`_ technical note.
 
-.. toctree::
-    user-guide/user-guide
-    :maxdepth: 2
+There are two scripts that perform operations of the CSC. They are ``run_dsm.py`` and ``shutdown_dsm.py``. The parameters they take can be found by passing ``-h`` or
+``--help`` to the given script. The ``run_dsm.py`` script constructs the CSC and sends
+it to ``ENABLED`` state, allowing for the CSC to function straight away. It can be
+run in real mode or one of two simulation modes. The simulation modes will be shown
+in the next section. To run the CSC in real mode, do the following.
 
-.. _Configuration:
+.. prompt:: bash
 
-Configuring the DSM
-=========================================
+  run_dsm.py
+
+The ``shutdown_dsm.py`` script can be used to send the CSC to ``STANDBY`` state or
+``OFFLINE`` state. If the CSC is sent to ``OFFLINE``, the process started
+by the ``run_dsm.py`` script will be shutdown and terminated. Since the run script will
+block the current container terminal, you will have to ``docker exec`` into the container to run the shutdown script. For ``STANDBY`` state, run the script this way.
+
+.. prompt:: bash
+
+  shutdown_dsm.py
+
+For ``OFFLINE`` state, run the script this way.
+
+.. prompt:: bash
+
+  shutdown_dsm.py -f
+
+.. _lsst.ts.DSM.configuration:
+
+Configuration
+-------------
 
 The DSM is a non-configurable CSC.
 
-.. _Development_Documentation:
+Simulator
+---------
 
-Development Documentation
-=========================
+There are two simulation modes available to the DSM CSC. One mode sends out the
+telemetry information every second (fast mode) and the other mode sends it out every 
+30 seconds (slow mode). The telemetry files are generated internally by the CSC
+so the operation looks very similar to real mode operation, except that the telemetry
+directory is a generated directory in ``/tmp`` and requires no special setup.
+To run the CSC in fast mode, do the following.
+
+.. prompt:: bash
+
+  run_dsm.py --simulate 1
+
+To run the CSC is slow mode, do the following.
+
+.. prompt:: bash
+
+  run_dsm.py --simulate 2
+
+.. _lsst.ts.DSM.developer_guide:
+
+Developer Guide
+===============
 
 This area of documentation focuses on the classes used, API's, and how to participate to the development of the DSM software packages.
 
 .. toctree::
-    developer-guide/developer-guide
+    developer-guide
     :maxdepth: 1
 
-.. _Version_History:
+.. _lsst.ts.DSM.version_history:
 
 Version History
 ===============

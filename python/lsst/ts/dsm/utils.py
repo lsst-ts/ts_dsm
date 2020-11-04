@@ -4,7 +4,8 @@ import yaml
 
 from astropy.time import Time, TimeDelta
 import numpy as np
-import pytz
+
+from lsst.ts import salobj
 
 __all__ = ["convert_time", "create_telemetry_config", "create_telemetry_data"]
 
@@ -23,8 +24,7 @@ def convert_time(in_time):
         The TAI time corresponding to the input.
     """
     ptime = Time(in_time, scale="utc")
-    # replace allows this to work if clock isn't in UTC.
-    return ptime.tai.datetime.replace(tzinfo=pytz.utc).timestamp()
+    return salobj.tai_from_utc(ptime)
 
 
 def create_telemetry_config(output_dir, sim_loop_time):

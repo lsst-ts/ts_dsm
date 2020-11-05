@@ -19,7 +19,6 @@ pipeline {
         string defaultValue: "salobj_v5.4.0", description: "Build number for the lsstts/deploy-env docker image.", name: 'deploy_env_tag', trim: true
         string defaultValue: "1.1.3_rc3_4.7.0", description: "IDL version.", name: 'idl_v', trim: true
         string defaultValue: "1.1.2rc1", description: "DSM version.", name: 'dsm_csc_v', trim: true
-        string defaultValue: "master", description: "DSM configuration version.", name: 'dsm_config_v', trim: true
     }
     stages {
         stage("Create docker network.") {
@@ -38,7 +37,8 @@ pipeline {
             }
             steps {
                 script {
-                    dockerImageMaster = docker.build(dockerImageNameMaster, "--no-cache --network net_b${BUILD_NUMBER} --build-arg deploy_env_tag=${env.deploy_env_tag} --build-arg idl_conda_version=${env.idl_v} --build-arg dsm_conda_version=${env.dsm_csc_v} --build-arg dsm_config_branch=master ./docker/")
+                    dockerImageMaster = docker.build(dockerImageNameMaster, "--no-cache --network net_b${BUILD_NUMBER} --build-arg deploy_env_tag=${env.deploy_env_tag} --build-arg idl_conda_version=${env.idl_v} --build-arg dsm_conda_version=${env.dsm_csc_v} --build-arg 
+                    ./docker/")
                 }
             }
         }
@@ -48,7 +48,8 @@ pipeline {
             }
             steps {
                 script {
-                    dockerImageDevelop = docker.build(dockerImageNameDevelop, "--no-cache --network net_b${BUILD_NUMBER} --build-arg deploy_env_tag=${env.deploy_env_tag} --build-arg idl_conda_version=${env.idl_v}--build-arg dsm_conda_version=${env.dsm_csc_v} --build-arg dsm_config_branch=develop ./docker/")
+                    dockerImageDevelop = docker.build(dockerImageNameDevelop, "--no-cache --network net_b${BUILD_NUMBER} --build-arg deploy_env_tag=${env.deploy_env_tag} --build-arg idl_conda_version=${env.idl_v}--build-arg dsm_conda_version=${env.dsm_csc_v} --build-arg 
+                    ./docker/")
                 }
             }
         }
@@ -63,7 +64,8 @@ pipeline {
             }
             steps {
                 script {
-                    dockerImageBuild = docker.build(dockerImageNameBuild, "--no-cache --network net_b${BUILD_NUMBER} --build-arg deploy_env_tag=${env.deploy_env_tag} --build-arg idl_conda_version=${env.idl_v} --build-arg dsm_conda_version=${env.dsm_csc_v} --build-arg dsm_config_branch=${env.dsm_config_v} ./docker/")
+                    dockerImageBuild = docker.build(dockerImageNameBuild, "--no-cache --network net_b${BUILD_NUMBER} --build-arg deploy_env_tag=${env.deploy_env_tag} --build-arg idl_conda_version=${env.idl_v} --build-arg dsm_conda_version=${env.dsm_csc_v} --build-arg 
+                    ./docker/")
                 }
             }
         }

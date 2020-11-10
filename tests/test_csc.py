@@ -83,9 +83,11 @@ class TestDSMCSC(salobj.BaseCscTestCase, asynctest.TestCase):
 
             # Check that the telemetry loop is running
             self.assertFalse(self.csc.telemetry_loop_task.done())
-            configuration = await self.remote.tel_configuration.next(
-                flush=False, timeout=LONG_TIMEOUT
-            )
+            try:
+                config_msg = self.remote.evt_configuration
+            except AttributeError:
+                config_msg = self.remote.tel_configuration
+            configuration = await config_msg.next(flush=False, timeout=LONG_TIMEOUT)
             self.assertEqual(configuration.dsmIndex, 1)
             self.assertGreater(configuration.timestampConfigStart, 0)
             self.assertEqual(configuration.uiVersionCode, "1.0.1")

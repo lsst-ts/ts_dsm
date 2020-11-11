@@ -4,6 +4,10 @@
 Version History
 ===============
 
+v2.1.0
+------
+* Convert configuration message from telemetry to event
+
 v2.0.0
 ------
 * Update to SALOBJ6 including upcoming deprecations

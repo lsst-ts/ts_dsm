@@ -197,7 +197,11 @@ class DSMCSC(salobj.BaseCsc):
             ui_config_file = pathlib.PosixPath(
                 content["ui_versions"]["config_file"]
             ).as_uri()
-            self.tel_configuration.set_put(
+            try:
+                config_msg = self.evt_configuration
+            except AttributeError:
+                config_msg = self.tel_configuration
+            config_msg.set_put(
                 dsmIndex=self.salinfo.index,
                 timestampConfigStart=utils.convert_time(content["timestamp"]),
                 uiVersionCode=content["ui_versions"]["code"],

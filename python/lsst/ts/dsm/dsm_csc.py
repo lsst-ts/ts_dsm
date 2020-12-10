@@ -28,6 +28,7 @@ class DSMCSC(salobj.BaseCsc):
     Commandable SAL Component to interface with the LSST DSMs.
     """
 
+    enable_cmdline_state = True
     valid_simulation_modes = (0, 1, 2)
 
     def __init__(

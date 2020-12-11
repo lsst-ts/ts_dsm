@@ -25,8 +25,8 @@ Overview
 
 The Dome Seeing Monitor (DSM) CSC is responsible for taking output telemetry
 files from the Dome Seeing Monitor UI and sending the information via SAL
-for recording in the EFD. Although the DSM is part of the Environmental Awareness
-System, it currently runs stand-alone and is not tied in to the EAS in any manner.
+for recording in the EFD.
+Although the DSM is part of the Environmental Awareness System, it currently runs stand-alone and is not tied in to the EAS in any manner.
 
 As with all CSCs, information on the package, developers and product owners can be found in the `Master CSC Table <ts_xml:index:master-csc-table:DSM>`_.
 
@@ -39,24 +39,28 @@ User Guide
 ==========
 
 The DSM CSC is a support CSC that is used in conjunction with the DSM UI in order
-to produce seeing measurements along the DSM probes line of sight. The functionality to produce these measurements are contained within the UI and are not described in this
-document. The UI is also responsible for the interaction with the DSM probe hardware. 
+to produce seeing measurements along the DSM probes line of sight.
+The functionality to produce these measurements are contained within the UI and are not described in this document.
+The UI is also responsible for the interaction with the DSM probe hardware. 
 The operational interaction of these systems and other details are captured in `SITCOMTN-001 <https://sitcomtn-001.lsst.io/>`_ technical note.
 
-There are two scripts that perform operations of the CSC. They are ``run_dsm.py`` and ``shutdown_dsm.py``. The parameters they take can be found by passing ``-h`` or
-``--help`` to the given script. The ``run_dsm.py`` script constructs the CSC and sends
-it to ``ENABLED`` state, allowing for the CSC to function straight away. It can be
-run in real mode or one of two simulation modes. The simulation modes will be shown
-in the next section. To run the CSC in real mode, do the following.
+There are two scripts that perform operations of the CSC.
+They are ``run_dsm.py`` and ``shutdown_dsm.py``. The parameters they take can be found by passing ``-h`` or ``--help`` to the given script.
+The ``run_dsm.py`` script constructs the CSC and using a flag, sends it to ``ENABLED`` state, allowing for the CSC to function straight away.
+It can be run in real mode or one of two simulation modes.
+The simulation modes will be shown in the next section. To run the CSC in real mode, do the following.
 
 .. prompt:: bash
 
-  run_dsm.py
+  run_dsm.py --state=enabled <index>
+
+The ``<index>`` is an integer value.
+The DSM currently has two indexes (1 and 2) for operational use. 
 
 The ``shutdown_dsm.py`` script can be used to send the CSC to ``STANDBY`` state or
-``OFFLINE`` state. If the CSC is sent to ``OFFLINE``, the process started
-by the ``run_dsm.py`` script will be shutdown and terminated. Since the run script will
-block the current container terminal, you will have to ``docker exec`` into the container to run the shutdown script. For ``STANDBY`` state, run the script this way.
+``OFFLINE`` state.
+If the CSC is sent to ``OFFLINE``, the process started by the ``run_dsm.py`` script will be shutdown and terminated.
+Since the run script will block the current container terminal, you will have to ``docker exec`` into the container to run the shutdown script. For ``STANDBY`` state, run the script this way.
 
 .. prompt:: bash
 
@@ -68,6 +72,9 @@ For ``OFFLINE`` state, run the script this way.
 
   shutdown_dsm.py -f
 
+In both cases, the script defaults to index=1.
+You must ensure that the index used by the shutdown script is commensurate with the one used by the run script.
+
 .. _lsst.ts.DSM.configuration:
 
 Configuration
@@ -78,22 +85,23 @@ The DSM is a non-configurable CSC.
 Simulator
 ---------
 
-There are two simulation modes available to the DSM CSC. One mode sends out the
-telemetry information every second (fast mode) and the other mode sends it out every 
-30 seconds (slow mode). The telemetry files are generated internally by the CSC
-so the operation looks very similar to real mode operation, except that the telemetry
-directory is a generated directory in ``/tmp`` and requires no special setup.
+There are two simulation modes available to the DSM CSC.
+One mode sends out the telemetry information every second (fast mode) and the other mode sends it out every 30 seconds (slow mode).
+The telemetry files are generated internally by the CSC so the operation looks very similar to real mode operation, except that the telemetry directory is a generated directory in ``/tmp`` and requires no special setup.
 To run the CSC in fast mode, do the following.
 
 .. prompt:: bash
 
-  run_dsm.py --simulate 1
+  run_dsm.py --simulate=1 1
 
 To run the CSC is slow mode, do the following.
 
 .. prompt:: bash
 
-  run_dsm.py --simulate 2
+  run_dsm.py --simulate=2 1
+
+The above commands will put the CSC into ``STANDBY`` state.
+Use the ``--state=enabled`` flag shown above to put the CSC into ``ENABLED`` state.
 
 .. _lsst.ts.DSM.developer_guide:
 

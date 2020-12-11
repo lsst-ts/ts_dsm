@@ -6,8 +6,8 @@ DSM Developer Guide
 
 The DSM is a non-configurable CSC that looks for output telemetry files from 
 the Dome Seeing Monitor UI and sends that information across SAL for recording
-in the EFD. The CSC also has two simulation modes in addition to the standard
-operational (real) mode. 
+in the EFD.
+The CSC also has two simulation modes in addition to the standard operational (real) mode. 
 
 .. _lsst.ts.DSM.api:
 
@@ -27,9 +27,9 @@ Build and Test
 ==============
 
 The recommended method for development is to get the T&S development Docker container.
-Instructions for this can be found `here <https://confluence.lsstcorp.org/display/LTS/CSC+Development>`_. Follow the section on ``Developing on your own local folder on
-Docker``. Since the DSM code is not shipped with the development container, a
-clone of the code is necessary.
+Instructions for this can be found `here <https://confluence.lsstcorp.org/display/LTS/CSC+Development>`_.
+Follow the section on ``Developing on your own local folder on Docker``.
+Since the DSM code is not shipped with the development container, a clone of the code is necessary.
 
 .. prompt:: bash
 
@@ -48,7 +48,8 @@ To build the code and run the unit tests, do the following.
     scons
 
 The ``pip`` installation of ``aionotify`` is required since the package does not come
-with the development environment. While developing the code, ``scons`` can be used to run the unit tests after code changes.
+with the development environment.
+While developing the code, ``scons`` can be used to run the unit tests after code changes.
 
 .. _lsst.ts.DSM.usage:
 
@@ -58,9 +59,11 @@ Usage
 The nominal usage patterns are covered in the :ref:`lsst.ts.DSM.user_guide`
 
 If the DSM is run in real mode for testing with the DSM UI, the telemetry directory
-that the UI uses must be mounted into the container. If one uses the repository
-location directory to create a directory (say ``telemetry``), this is handled by the 
-``docker run`` command shown above. However, the DSM CSC expects the telemetry directory to be in ``/home/saluser/telemetry``. This can be overridden by using the ``DSM_TELEMETRY_DIR`` environment variable to set the new path. It should be:
+that the UI uses must be mounted into the container.
+If one uses the repository location directory to create a directory (say ``telemetry``), this is handled by the ``docker run`` command shown above.
+However, the DSM CSC expects the telemetry directory to be in ``/home/saluser/telemetry``.
+This can be overridden by using the ``DSM_TELEMETRY_DIR`` environment variable to set the new path.
+It should be:
 
 .. prompt:: bash
 
@@ -74,15 +77,13 @@ Building the Documentation
 ==========================
 
 If the process described in :ref:`lsst.ts.DSM.build` has been followed, then one builds the
-documentation by running the following from the top-level directory of
-the repository clone:
+documentation by running the following from the top-level directory of the repository clone:
 
 .. prompt:: bash
 
   package-docs build
 
-If the ``documenteer`` package is not installed, then do the following before
-building the documentation from the top-level repository directory.
+If the ``documenteer`` package is not installed, then do the following before building the documentation from the top-level repository directory.
 
 .. prompt:: bash
 

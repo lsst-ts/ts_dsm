@@ -46,8 +46,9 @@ The operational interaction of these systems and other details are captured in `
 
 There are two scripts that perform operations of the CSC.
 They are ``run_dsm.py`` and ``shutdown_dsm.py``. The parameters they take can be found by passing ``-h`` or ``--help`` to the given script.
-The ``run_dsm.py`` script constructs the CSC and using a flag, sends it to ``ENABLED`` state, allowing for the CSC to function straight away.
-It can be run in real mode or one of two simulation modes.
+The ``run_dsm.py`` script constructs the CSC optionally sends it to a specified state.
+We typically want this CSC to be running straight away, in which case specify ``--state=enabled``.
+The CSC can be run in real mode or one of two simulation modes.
 The simulation modes will be shown in the next section. To run the CSC in real mode, do the following.
 
 .. prompt:: bash
@@ -55,25 +56,27 @@ The simulation modes will be shown in the next section. To run the CSC in real m
   run_dsm.py --state=enabled <index>
 
 The ``<index>`` is an integer value.
-The DSM currently has two indexes (1 and 2) for operational use. 
+The DSM currently has two indexes (1 and 2) since there are two units in operation. 
 
-The ``shutdown_dsm.py`` script can be used to send the CSC to ``STANDBY`` state or
-``OFFLINE`` state.
+Since the DSMs are mobile field units, shutting down the CSCs via the ScriptQueue is not always practical from the field.
+Also, while observing is under way, it may be difficult to get a priority interrupt into the queue to perform the shutdown.
+To allow for operator independence, a shutdown script is provided.
+The ``shutdown_dsm.py`` script can be used to send the CSC to ``STANDBY`` or ``OFFLINE`` state.
 If the CSC is sent to ``OFFLINE``, the process started by the ``run_dsm.py`` script will be shutdown and terminated.
-Since the run script will block the current container terminal, you will have to ``docker exec`` into the container to run the shutdown script. For ``STANDBY`` state, run the script this way.
+Since the run script will block the current container terminal, you will have to ``docker exec`` into the container to run the shutdown script.
+For ``STANDBY`` state, run the script this way.
 
 .. prompt:: bash
 
-  shutdown_dsm.py
+  shutdown_dsm.py --state=standby <index>
 
-For ``OFFLINE`` state, run the script this way.
+To stop the run script, execute the shutdown script this way.
 
 .. prompt:: bash
 
-  shutdown_dsm.py -f
+  shutdown_dsm.py --state=offline <index>
 
-In both cases, the script defaults to index=1.
-You must ensure that the index used by the shutdown script is commensurate with the one used by the run script.
+You must ensure that the index used by the shutdown script is matches the one used by the run script.
 
 .. _lsst.ts.DSM.configuration:
 

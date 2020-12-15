@@ -7,10 +7,7 @@ from lsst.ts import salobj
 
 
 async def shutdown(opts):
-    if opts.full:
-        end_state = salobj.State.OFFLINE
-    else:
-        end_state = salobj.State.STANDBY
+    end_state = getattr(salobj.State, opts.state.upper())
 
     domain = salobj.Domain()
     try:
@@ -27,18 +24,14 @@ def main(opts):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Shutdown (default: STANDBY) the DSM CSC."
-    )
+    parser = argparse.ArgumentParser(description="Shutdown the DSM CSC.")
     parser.add_argument(
-        "-i",
-        "--index",
+        "index",
         type=int,
-        default=1,
-        help="SAL index; use the default value unless you sure you know what you are doing",
+        help="SAL index; Must match the index to the running process you wish to terminate.",
     )
     parser.add_argument(
-        "-f", "--full", action="store_true", help="Take CSC to OFFLINE state."
+        "--state", choices=["standby", "offline"], help="Set the shutdown state."
     )
     args = parser.parse_args()
 

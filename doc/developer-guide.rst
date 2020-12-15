@@ -61,15 +61,9 @@ The nominal usage patterns are covered in the :ref:`lsst.ts.DSM.user_guide`
 If the DSM is run in real mode for testing with the DSM UI, the telemetry directory
 that the UI uses must be mounted into the container.
 If one uses the repository location directory to create a directory (say ``telemetry``), this is handled by the ``docker run`` command shown above.
-However, the DSM CSC expects the telemetry directory to be in ``/home/saluser/telemetry``.
+However, the DSM CSC expects the telemetry directory to be in ``/home/saluser/telemetry`` which is not provided in the development container.
 This can be overridden by using the ``DSM_TELEMETRY_DIR`` environment variable to set the new path.
-It should be:
-
-.. prompt:: bash
-
-  export DSM_TELEMETRY_DIR=/home/saluser/develop/{path for telemetry directory}
-
-and done in the development container before running the startup script.
+The environment variable can be passed in as a command-line argument when the development container is started.
 
 .. _lsst.ts.DSM.documentation:
 

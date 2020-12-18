@@ -4,6 +4,12 @@
 Version History
 ===============
 
+v2.2.0
+------
+* Allow command-line state transitioning for CSC
+* Update documentation to reflect new functionality
+* Convert to new pre-commit methodology
+
 v2.1.0
 ------
 * Convert configuration message from telemetry to event

@@ -1,6 +1,6 @@
 {% set data= load_setup_py_data() %}
 package:
-  name: ts-dsm
+  name: "ts-dsm"
   version: {{ data.get('version') }}
 
 source:
@@ -19,14 +19,10 @@ build:
 
 test:
   requires:
-    - pytest
-    - pytest-flake8
-    - pytest-cov
-    - asynctest
-    - black==19.10b0
+    - ts-conda-build
     - ts-dds
-    - ts-salobj
-    - ts-idl
+    - ts-salobj {{ salobj_version }}
+    - ts-idl {{ idl_version }}
     - aionotify
     - pytz
   source_files:

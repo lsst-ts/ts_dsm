@@ -4,6 +4,17 @@
 Version History
 ===============
 
+v2.2.1
+------
+* Update code to new black version
+* Pin conda builder version
+* Update pre-commit hook versions
+* Fix documentation build issue
+* Update unit tests to new base class
+* Fix internal simulation mode variable
+* Set version class variable to silence warning
+* Disable test due to salobj issue
+
 v2.2.0
 ------
 * Allow command-line state transitioning for CSC

@@ -1,11 +1,12 @@
-"""Sphinx configuration file for TSSW package"""
+"""Sphinx configuration file for an LSST stack package.
+This configuration only affects single-package Sphinx documentation builds.
+"""
 
-from documenteer.sphinxconfig.stackconf import build_package_configs
-import lsst.ts.dsm
+from documenteer.conf.pipelinespkg import *  # noqa
+import lsst.ts.dsm  # noqa
 
-
-_g = globals()
-_g.update(build_package_configs(project_name="ts_dsm", version=lsst.ts.dsm.__version__))
-
-intersphinx_mapping["ts_xml"] = ("https://ts-xml.lsst.io", None)  # noqa
-intersphinx_mapping["ts_salobj"] = ("https://ts-salobj.lsst.io", None)  # noqa
+project = "ts_dsm"
+html_theme_options["logotext"] = project  # noqa
+html_title = project
+html_short_title = project
+doxylink = {}  # Avoid warning: Could not find tag file _doxygen/doxygen.tag

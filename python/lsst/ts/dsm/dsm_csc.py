@@ -29,7 +29,9 @@ class DSMCSC(salobj.BaseCsc):
     """
 
     enable_cmdline_state = True
+    # The simulation modes fully are documented in the CSC user guide.
     valid_simulation_modes = (0, 1, 2)
+    simulation_help = "0: real mode, 1: fast simulation, 2: slow simulation"
     version = __version__
 
     def __init__(

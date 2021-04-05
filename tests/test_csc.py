@@ -144,7 +144,7 @@ class TestDSMCSC(salobj.BaseCscTestCase, unittest.IsolatedAsyncioTestCase):
             )
             self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
-    async def xtest_bad_simulation_mode(self):
+    def test_bad_simulation_mode(self):
         """Test to ensure bad simulation modes raise"""
         with self.assertRaises(ValueError):
             dsm_csc.DSMCSC(

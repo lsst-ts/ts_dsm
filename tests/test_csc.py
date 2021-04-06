@@ -3,7 +3,6 @@ import os
 import shutil
 import unittest
 
-import asynctest
 import numpy as np
 
 from lsst.ts import salobj
@@ -17,25 +16,25 @@ STD_TIMEOUT = 5
 LONG_TIMEOUT = 20  # timeout for starting SAL components (sec)
 
 
-class TestDSMCSC(salobj.BaseCscTestCase, asynctest.TestCase):
+class TestDSMCSC(salobj.BaseCscTestCase, unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         salobj.set_random_lsst_dds_partition_prefix()
         self.telemetry_directory = ""
 
-    async def tearDown(self):
+    def tearDown(self):
         self.cleanup(self.telemetry_directory)
 
     def cleanup(self, directory):
-        """Cleanup telemetry directory if tests fail.
-        """
+        """Cleanup telemetry directory if tests fail."""
         if os.path.exists(directory):
             shutil.rmtree(directory)
 
     def basic_make_csc(self, initial_state, config_dir, simulation_mode):
-        """Make a DSM CSC.
-        """
+        """Make a DSM CSC."""
         return dsm_csc.DSMCSC(
-            index=1, initial_state=initial_state, simulation_mode=simulation_mode,
+            index=1,
+            initial_state=initial_state,
+            simulation_mode=simulation_mode,
         )
 
     async def test_lifecycle_behavior(self):
@@ -145,12 +144,13 @@ class TestDSMCSC(salobj.BaseCscTestCase, asynctest.TestCase):
             )
             self.assertEqual(state.summaryState, salobj.State.STANDBY)
 
-    async def test_bad_simulation_mode(self):
-        """Test to ensure bad simulation modes raise
-        """
+    def test_bad_simulation_mode(self):
+        """Test to ensure bad simulation modes raise"""
         with self.assertRaises(ValueError):
             dsm_csc.DSMCSC(
-                index=1, initial_state=salobj.State.STANDBY, simulation_mode=3,
+                index=1,
+                initial_state=salobj.State.STANDBY,
+                simulation_mode=3,
             )
 
 

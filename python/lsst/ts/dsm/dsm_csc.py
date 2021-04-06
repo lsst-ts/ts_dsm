@@ -29,10 +29,16 @@ class DSMCSC(salobj.BaseCsc):
     """
 
     enable_cmdline_state = True
+    # The simulation modes fully are documented in the CSC user guide.
     valid_simulation_modes = (0, 1, 2)
+    simulation_help = "0: real mode, 1: fast simulation, 2: slow simulation"
+    version = __version__
 
     def __init__(
-        self, index, initial_state=salobj.State.STANDBY, simulation_mode=0,
+        self,
+        index,
+        initial_state=salobj.State.STANDBY,
+        simulation_mode=0,
     ):
         """
         Initialize DSM CSC.
@@ -55,18 +61,19 @@ class DSMCSC(salobj.BaseCsc):
         self.simulation_loop_time = None
 
         super().__init__(
-            "DSM", index, initial_state=initial_state, simulation_mode=simulation_mode,
+            "DSM",
+            index,
+            initial_state=initial_state,
+            simulation_mode=simulation_mode,
         )
 
         ch = logging.StreamHandler()
         self.log.addHandler(ch)
 
-        self.evt_softwareVersions.set(cscVersion=__version__)
         self.finish_csc_setup()
 
     def cleanup_simulation(self):
-        """Remove all generated files and directory from simulation
-        """
+        """Remove all generated files and directory from simulation"""
         if os.path.exists(self.telemetry_directory):
             for tfile in os.listdir(self.telemetry_directory):
                 os.remove(os.path.join(self.telemetry_directory, tfile))
@@ -76,16 +83,15 @@ class DSMCSC(salobj.BaseCsc):
 
         This method will remove the telemetry directory if in simulation mode.
         """
-        if self._requested_simulation_mode:
+        if self.simulation_mode:
             if os.path.exists(self.telemetry_directory):
                 shutil.rmtree(self.telemetry_directory)
 
         await super().close_tasks()
 
     def finish_csc_setup(self):
-        """Perform final setup steps for CSC.
-        """
-        if self._requested_simulation_mode:
+        """Perform final setup steps for CSC."""
+        if self.simulation_mode:
             if (
                 self.telemetry_directory is None
                 or not self.telemetry_directory.startswith("/tmp")
@@ -99,13 +105,10 @@ class DSMCSC(salobj.BaseCsc):
                 "DSM_TELEMETRY_DIR", DEFAULT_DSM_TELEMETRY_DIR
             )
 
-        self.simulation_loop_time = SIMULATION_LOOP_TIMES[
-            self._requested_simulation_mode
-        ]
+        self.simulation_loop_time = SIMULATION_LOOP_TIMES[self.simulation_mode]
 
     async def handle_summary_state(self):
-        """Handle things that depend on state.
-        """
+        """Handle things that depend on state."""
         self.log.debug(f"Current state: {self.summary_state}")
         if self.summary_state is salobj.State.ENABLED:
             self.log.debug(f"Telemetry dir: {self.telemetry_directory}")
@@ -122,15 +125,12 @@ class DSMCSC(salobj.BaseCsc):
             if self.telemetry_loop_task.done():
                 self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
 
-            if (
-                self._requested_simulation_mode
-                and self.simulated_telemetry_loop_task.done()
-            ):
+            if self.simulation_mode and self.simulated_telemetry_loop_task.done():
                 self.simulated_telemetry_loop_task = asyncio.create_task(
                     self.simulated_telemetry_loop()
                 )
         else:
-            if self._requested_simulation_mode:
+            if self.simulation_mode:
                 self.simulated_telemetry_loop_task.cancel()
                 self.simulated_telemetry_ui_config_written = False
                 self.cleanup_simulation()
@@ -215,8 +215,7 @@ class DSMCSC(salobj.BaseCsc):
             )
 
     async def simulated_telemetry_loop(self):
-        """Run the simulated telemetry loop.
-        """
+        """Run the simulated telemetry loop."""
         while True:
             if not self.simulated_telemetry_ui_config_written:
                 utils.create_telemetry_config(
@@ -231,8 +230,7 @@ class DSMCSC(salobj.BaseCsc):
             await asyncio.sleep(self.simulation_loop_time)
 
     async def telemetry_loop(self):
-        """Run the telemetry loop.
-        """
+        """Run the telemetry loop."""
         while True:
             ioevent = await self.telemetry_watcher.get_event()
             self.process_event(ioevent)

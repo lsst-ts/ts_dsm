@@ -52,11 +52,14 @@ def create_telemetry_config(output_dir, sim_loop_time):
     content = dict(
         timestamp=Time.now().isot,
         ui_versions=dict(
-            code=ui_version, config=ui_config_version, config_file=ui_config_file,
+            code=ui_version,
+            config=ui_config_version,
+            config_file=ui_config_file,
         ),
         camera=dict(name=camera_name, fps=camera_fps),
         data=dict(
-            buffer_size=data_buffer_size, acquisition_time=data_acquisition_time,
+            buffer_size=data_buffer_size,
+            acquisition_time=data_acquisition_time,
         ),
     )
 

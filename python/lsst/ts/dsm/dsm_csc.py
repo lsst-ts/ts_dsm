@@ -7,7 +7,7 @@ import shutil
 import tempfile
 import yaml
 
-import aionotify
+import asyncinotify
 
 from lsst.ts import salobj
 
@@ -55,7 +55,8 @@ class DSMCSC(salobj.BaseCsc):
 
         self.telemetry_directory = None
         self.telemetry_loop_task = salobj.make_done_future()
-        self.telemetry_watcher = aionotify.Watcher()
+        self.telemetry_notifier = asyncinotify.Inotify()
+        self.telemetry_watch = None
         self.simulated_telemetry_ui_config_written = False
         self.simulated_telemetry_loop_task = salobj.make_done_future()
         self.simulation_loop_time = None
@@ -113,11 +114,9 @@ class DSMCSC(salobj.BaseCsc):
         if self.summary_state is salobj.State.ENABLED:
             self.log.debug(f"Telemetry dir: {self.telemetry_directory}")
             try:
-                self.telemetry_watcher.watch(
-                    path=self.telemetry_directory, flags=aionotify.Flags.CLOSE_WRITE
+                self.telemetry_watch = self.telemetry_notifier.add_watch(
+                    path=self.telemetry_directory, mask=asyncinotify.Mask.CLOSE_WRITE
                 )
-                loop = asyncio.get_running_loop()
-                await self.telemetry_watcher.setup(loop)
             except (AssertionError, ValueError):
                 # Watch already running
                 pass
@@ -136,20 +135,21 @@ class DSMCSC(salobj.BaseCsc):
                 self.cleanup_simulation()
 
             self.telemetry_loop_task.cancel()
-            if not self.telemetry_watcher.closed:
-                self.telemetry_watcher.unwatch(self.telemetry_directory)
-                self.telemetry_watcher.close()
+            if self.telemetry_watch is not None:
+                self.telemetry_notifier.rm_watch(self.telemetry_watch)
+                self.telemetry_watch = None
+                self.telemetry_notifier.close()
 
     def process_dat_file(self, ifile):
         """Process the dome seeing DAT file and send telemetry.
 
         Parameters
         ----------
-        ifile : `str`
+        ifile : `pathlib.PosixPath`
           The filename to read and process.
         """
         self.log.info(f"Process {ifile} file.")
-        with open(os.path.join(self.telemetry_directory, ifile), "r") as infile:
+        with open(ifile, "r") as infile:
             reader = csv.reader(infile)
             for row in reader:
                 try:
@@ -176,26 +176,26 @@ class DSMCSC(salobj.BaseCsc):
 
         Parameters
         ----------
-        event : `aionotify.Event`
+        event : `asyncinotify.Event`
             Payload containing the I/O event information.
         """
-        self.log.debug(f"Event: Flags = {event.flags}, Name = {event.name}")
-        if event.flags & aionotify.Flags.CLOSE_WRITE:
-            if event.name.endswith("yaml"):
-                self.process_yaml_file(event.name)
-            if event.name.endswith("dat"):
-                self.process_dat_file(event.name)
+        self.log.debug(f"Event: Mask = {event.mask}, Name = {event.name}")
+        if event.mask & asyncinotify.Mask.CLOSE_WRITE:
+            if event.name.suffix == ".yaml":
+                self.process_yaml_file(event.path)
+            if event.name.suffix == ".dat":
+                self.process_dat_file(event.path)
 
     def process_yaml_file(self, ifile):
         """Process the UI configuration YAML file and send telemetry.
 
         Parameters
         ----------
-        ifile : `str`
+        ifile : `pathlib.PosixPath`
           The filename to read and process.
         """
         self.log.info(f"Process {ifile} file.")
-        with open(os.path.join(self.telemetry_directory, ifile), "r") as infile:
+        with open(ifile, "r") as infile:
             content = yaml.safe_load(infile)
             ui_config_file = pathlib.PosixPath(
                 content["ui_versions"]["config_file"]
@@ -234,5 +234,5 @@ class DSMCSC(salobj.BaseCsc):
     async def telemetry_loop(self):
         """Run the telemetry loop."""
         while True:
-            ioevent = await self.telemetry_watcher.get_event()
+            ioevent = await self.telemetry_notifier.get()
             self.process_event(ioevent)

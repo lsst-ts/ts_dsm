@@ -1,8 +1,11 @@
-.... _Version_History:
-
 ===============
 Version History
 ===============
+
+v2.3.0
+------
+
+* Switch to `asyncinotify <https://asyncinotify.readthedocs.io/>`_ for file system watcher
 
 v2.2.2
 ------

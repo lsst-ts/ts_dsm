@@ -4,6 +4,12 @@
 Version History
 ===============
 
+v2.2.2
+------
+
+* Remove simulation file after message sent
+* Remove pytest-runner from conda build
+
 v2.2.1
 ------
 * Update code to new black version

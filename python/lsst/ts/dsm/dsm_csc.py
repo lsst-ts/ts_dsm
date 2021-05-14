@@ -168,6 +168,8 @@ class DSMCSC(salobj.BaseCsc):
                     )
                 except IndexError as error:
                     self.log.error(f"{ifile}: {error}")
+        if self.simulation_mode:
+            os.remove(os.path.join(self.telemetry_directory, ifile))
 
     def process_event(self, event):
         """Process I/O Events.

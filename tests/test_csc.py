@@ -78,7 +78,7 @@ class TestDSMCSC(salobj.BaseCscTestCase, unittest.IsolatedAsyncioTestCase):
             self.telemetry_directory = self.csc.telemetry_directory
             self.assertFalse(self.csc.simulated_telemetry_loop_task.done())
             sim_files = len(list(os.listdir(self.csc.telemetry_directory)))
-            self.assertEqual(sim_files, 2)
+            self.assertEqual(sim_files, 1)
 
             # Check that the telemetry loop is running
             self.assertFalse(self.csc.telemetry_loop_task.done())

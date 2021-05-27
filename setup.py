@@ -21,7 +21,7 @@ setuptools.setup(
         "write_to": "python/lsst/ts/dsm/version.py",
         "write_to_template": scm_version_template,
     },
-    setup_requires=["setuptools_scm", "pytest-runner"],
+    setup_requires=["setuptools_scm"],
     install_requires=install_requires,
     package_dir={"": "python"},
     packages=setuptools.find_namespace_packages(where="python"),

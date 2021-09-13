@@ -84,6 +84,11 @@ class DSMCSC(salobj.BaseCsc):
 
         This method will remove the telemetry directory if in simulation mode.
         """
+        if self.telemetry_watch is not None:
+            self.telemetry_notifier.rm_watch(self.telemetry_watch)
+            self.telemetry_watch = None
+            self.telemetry_notifier.close()
+
         if self.simulation_mode:
             if os.path.exists(self.telemetry_directory):
                 shutil.rmtree(self.telemetry_directory)
@@ -135,10 +140,6 @@ class DSMCSC(salobj.BaseCsc):
                 self.cleanup_simulation()
 
             self.telemetry_loop_task.cancel()
-            if self.telemetry_watch is not None:
-                self.telemetry_notifier.rm_watch(self.telemetry_watch)
-                self.telemetry_watch = None
-                self.telemetry_notifier.close()
 
     def process_dat_file(self, ifile):
         """Process the dome seeing DAT file and send telemetry.
@@ -180,11 +181,10 @@ class DSMCSC(salobj.BaseCsc):
             Payload containing the I/O event information.
         """
         self.log.debug(f"Event: Mask = {event.mask}, Name = {event.name}")
-        if event.mask & asyncinotify.Mask.CLOSE_WRITE:
-            if event.name.suffix == ".yaml":
-                self.process_yaml_file(event.path)
-            if event.name.suffix == ".dat":
-                self.process_dat_file(event.path)
+        if event.name.suffix == ".yaml":
+            self.process_yaml_file(event.path)
+        if event.name.suffix == ".dat":
+            self.process_dat_file(event.path)
 
     def process_yaml_file(self, ifile):
         """Process the UI configuration YAML file and send telemetry.
@@ -233,6 +233,5 @@ class DSMCSC(salobj.BaseCsc):
 
     async def telemetry_loop(self):
         """Run the telemetry loop."""
-        while True:
-            ioevent = await self.telemetry_notifier.get()
+        async for ioevent in self.telemetry_notifier:
             self.process_event(ioevent)

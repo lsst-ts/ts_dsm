@@ -4,10 +4,10 @@
 DSM Developer Guide
 ###################
 
-The DSM is a non-configurable CSC that looks for output telemetry files from 
+The DSM is a non-configurable CSC that looks for output telemetry files from
 the Dome Seeing Monitor UI and sends that information across SAL for recording
 in the EFD.
-The CSC also has two simulation modes in addition to the standard operational (real) mode. 
+The CSC also has two simulation modes in addition to the standard operational (real) mode.
 
 .. _lsst.ts.DSM.api:
 
@@ -35,7 +35,7 @@ Since the DSM code is not shipped with the development container, a clone of the
 
   git clone git@github.com:lsst-ts/ts_dsm.git
 
-Change or create the appropriate branch in the clone. 
+Change or create the appropriate branch in the clone.
 
 To build the code and run the unit tests, do the following.
 
@@ -44,12 +44,12 @@ To build the code and run the unit tests, do the following.
     docker run -it --name {name for container} -v {repository_location}:/home/saluser/develop lsstts/develop-env:{tag}
     cd develop/ts_dsm
     setup -kr .
-    pip install aionotify
-    scons
+    conda install -c conda-forge asyncinotify
+    pytest
 
-The ``pip`` installation of ``aionotify`` is required since the package does not come
+The ``conda` installation of ``asyncinotify`` is required since the package does not come
 with the development environment.
-While developing the code, ``scons`` can be used to run the unit tests after code changes.
+While developing the code, ``pytest`` can be used to run the unit tests after code changes.
 
 .. _lsst.ts.DSM.usage:
 

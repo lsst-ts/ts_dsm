@@ -6,11 +6,12 @@ import unittest
 import numpy as np
 
 from lsst.ts import salobj
+from lsst.ts import utils
 from lsst.ts.dsm import dsm_csc
 
 np.random.seed(47)
 
-index_gen = salobj.index_generator()
+index_gen = utils.index_generator()
 
 STD_TIMEOUT = 5
 LONG_TIMEOUT = 20  # timeout for starting SAL components (sec)

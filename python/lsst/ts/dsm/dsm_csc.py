@@ -10,6 +10,7 @@ import yaml
 import asyncinotify
 
 from lsst.ts import salobj
+from lsst.ts import utils as tsUtils
 
 from . import utils
 from lsst.ts.dsm import __version__
@@ -54,11 +55,11 @@ class DSMCSC(salobj.BaseCsc):
         """
 
         self.telemetry_directory = None
-        self.telemetry_loop_task = salobj.make_done_future()
+        self.telemetry_loop_task = tsUtils.make_done_future()
         self.telemetry_notifier = asyncinotify.Inotify()
         self.telemetry_watch = None
         self.simulated_telemetry_ui_config_written = False
-        self.simulated_telemetry_loop_task = salobj.make_done_future()
+        self.simulated_telemetry_loop_task = tsUtils.make_done_future()
         self.simulation_loop_time = None
 
         super().__init__(

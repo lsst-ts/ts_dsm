@@ -23,6 +23,7 @@ test:
     - ts-dds
     - ts-salobj {{ salobj_version }}
     - ts-idl {{ idl_version }}
+    - ts-utils
     - asyncinotify
     - pytz
   source_files:
@@ -45,6 +46,7 @@ requirements:
     - setuptools_scm
     - ts-dds
     - ts-salobj
+    - ts-utils
     - asyncinotify
     - pytz
 

@@ -5,7 +5,7 @@ import yaml
 from astropy.time import Time, TimeDelta
 import numpy as np
 
-from lsst.ts import salobj
+from lsst.ts import utils as tsUtils
 
 __all__ = ["convert_time", "create_telemetry_config", "create_telemetry_data"]
 
@@ -24,7 +24,7 @@ def convert_time(in_time):
         The TAI time corresponding to the input.
     """
     ptime = Time(in_time, scale="utc")
-    return salobj.tai_from_utc(ptime)
+    return tsUtils.tai_from_utc(ptime)
 
 
 def create_telemetry_config(output_dir, sim_loop_time):

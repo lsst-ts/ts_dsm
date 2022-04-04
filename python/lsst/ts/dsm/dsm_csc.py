@@ -10,6 +10,7 @@ import yaml
 import asyncinotify
 
 from lsst.ts import salobj
+from lsst.ts import utils as tsUtils
 
 from . import utils
 from lsst.ts.dsm import __version__
@@ -54,11 +55,11 @@ class DSMCSC(salobj.BaseCsc):
         """
 
         self.telemetry_directory = None
-        self.telemetry_loop_task = salobj.make_done_future()
+        self.telemetry_loop_task = tsUtils.make_done_future()
         self.telemetry_notifier = asyncinotify.Inotify()
         self.telemetry_watch = None
         self.simulated_telemetry_ui_config_written = False
-        self.simulated_telemetry_loop_task = salobj.make_done_future()
+        self.simulated_telemetry_loop_task = tsUtils.make_done_future()
         self.simulation_loop_time = None
 
         super().__init__(
@@ -141,7 +142,7 @@ class DSMCSC(salobj.BaseCsc):
 
             self.telemetry_loop_task.cancel()
 
-    def process_dat_file(self, ifile):
+    async def process_dat_file(self, ifile):
         """Process the dome seeing DAT file and send telemetry.
 
         Parameters
@@ -154,7 +155,7 @@ class DSMCSC(salobj.BaseCsc):
             reader = csv.reader(infile)
             for row in reader:
                 try:
-                    self.tel_domeSeeing.set_put(
+                    await self.tel_domeSeeing.set_write(
                         dsmIndex=self.salinfo.index,
                         timestampCurrent=utils.convert_time(row[0]),
                         timestampFirstMeasurement=utils.convert_time(row[1]),
@@ -172,7 +173,7 @@ class DSMCSC(salobj.BaseCsc):
         if self.simulation_mode:
             os.remove(os.path.join(self.telemetry_directory, ifile))
 
-    def process_event(self, event):
+    async def process_event(self, event):
         """Process I/O Events.
 
         Parameters
@@ -182,11 +183,11 @@ class DSMCSC(salobj.BaseCsc):
         """
         self.log.debug(f"Event: Mask = {event.mask}, Name = {event.name}")
         if event.name.suffix == ".yaml":
-            self.process_yaml_file(event.path)
+            await self.process_yaml_file(event.path)
         if event.name.suffix == ".dat":
-            self.process_dat_file(event.path)
+            await self.process_dat_file(event.path)
 
-    def process_yaml_file(self, ifile):
+    async def process_yaml_file(self, ifile):
         """Process the UI configuration YAML file and send telemetry.
 
         Parameters
@@ -204,7 +205,7 @@ class DSMCSC(salobj.BaseCsc):
                 config_msg = self.evt_configuration
             except AttributeError:
                 config_msg = self.tel_configuration
-            config_msg.set_put(
+            await config_msg.set_write(
                 dsmIndex=self.salinfo.index,
                 timestampConfigStart=utils.convert_time(content["timestamp"]),
                 uiVersionCode=content["ui_versions"]["code"],
@@ -234,4 +235,4 @@ class DSMCSC(salobj.BaseCsc):
     async def telemetry_loop(self):
         """Run the telemetry loop."""
         async for ioevent in self.telemetry_notifier:
-            self.process_event(ioevent)
+            await self.process_event(ioevent)

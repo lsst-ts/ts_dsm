@@ -2,6 +2,11 @@
 Version History
 ===============
 
+v2.4.0
+------
+
+* Support for salobj 7
+
 v2.3.0
 ------
 

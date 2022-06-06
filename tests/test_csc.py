@@ -156,6 +156,11 @@ class TestDSMCSC(salobj.BaseCscTestCase, unittest.IsolatedAsyncioTestCase):
                 simulation_mode=3,
             )
 
+    async def test_bin_script(self):
+        await self.check_bin_script(
+            name="DSM", index=1, exe_name="run_dsm", cmdline_args=["--simulate", "1"]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

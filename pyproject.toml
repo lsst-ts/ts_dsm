@@ -10,6 +10,10 @@ classifiers = [ "Programming Language :: Python :: 3" ]
 urls = { documentation = "https://jira.lsstcorp.org/secure/Dashboard.jspa", repository = "https://github.com/lsst-ts/ts_dsm" }
 dynamic = [ "version" ]
 
+[project.scripts]
+run_dsm = "lsst.ts.dsm:run_dsm"
+shutdown_dsm = "lsst.ts.dsm:shutdown_dsm"
+
 [tool.setuptools.dynamic]
 version = { attr = "setuptools_scm.get_version" }
 

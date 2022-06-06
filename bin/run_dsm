@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+from lsst.ts.dsm import run_dsm
+
+run_dsm()

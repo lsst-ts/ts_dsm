@@ -1,2 +1,2 @@
 @Library('JenkinsShared')_
-CondaPipeline("", "ts-dsm", "lsst.ts.dsm")
+CondaPipeline("", "ts-dsm", "lsst.ts.dsm", "noarch")

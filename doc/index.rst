@@ -41,40 +41,40 @@ User Guide
 The DSM CSC is a support CSC that is used in conjunction with the DSM UI in order
 to produce seeing measurements along the DSM probes line of sight.
 The functionality to produce these measurements are contained within the UI and are not described in this document.
-The UI is also responsible for the interaction with the DSM probe hardware. 
+The UI is also responsible for the interaction with the DSM probe hardware.
 The operational interaction of these systems and other details are captured in `SITCOMTN-001 <https://sitcomtn-001.lsst.io/>`_ technical note.
 
 There are two scripts that perform operations of the CSC.
-They are ``run_dsm.py`` and ``shutdown_dsm.py``. The parameters they take can be found by passing ``-h`` or ``--help`` to the given script.
-The ``run_dsm.py`` script constructs the CSC optionally sends it to a specified state.
+They are ``run_dsm`` and ``shutdown_dsm``. The parameters they take can be found by passing ``-h`` or ``--help`` to the given script.
+The ``run_dsm`` script constructs the CSC optionally sends it to a specified state.
 We typically want this CSC to be running straight away, in which case specify ``--state=enabled``.
 The CSC can be run in real mode or one of two simulation modes.
 The simulation modes will be shown in the next section. To run the CSC in real mode, do the following.
 
 .. prompt:: bash
 
-  run_dsm.py --state=enabled <index>
+  run_dsm --state=enabled <index>
 
 The ``<index>`` is an integer value.
-The DSM currently has two indexes (1 and 2) since there are two units in operation. 
+The DSM currently has two indexes (1 and 2) since there are two units in operation.
 
 Since the DSMs are mobile field units, shutting down the CSCs via the ScriptQueue is not always practical from the field.
 Also, while observing is under way, it may be difficult to get a priority interrupt into the queue to perform the shutdown.
 To allow for operator independence, a shutdown script is provided.
-The ``shutdown_dsm.py`` script can be used to send the CSC to ``STANDBY`` or ``OFFLINE`` state.
-If the CSC is sent to ``OFFLINE``, the process started by the ``run_dsm.py`` script will be shutdown and terminated.
+The ``shutdown_dsm`` script can be used to send the CSC to ``STANDBY`` or ``OFFLINE`` state.
+If the CSC is sent to ``OFFLINE``, the process started by the ``run_dsm`` script will be shutdown and terminated.
 Since the run script will block the current container terminal, you will have to ``docker exec`` into the container to run the shutdown script.
 For ``STANDBY`` state, run the script this way.
 
 .. prompt:: bash
 
-  shutdown_dsm.py --state=standby <index>
+  shutdown_dsm --state=standby <index>
 
 To stop the run script, execute the shutdown script this way.
 
 .. prompt:: bash
 
-  shutdown_dsm.py --state=offline <index>
+  shutdown_dsm --state=offline <index>
 
 You must ensure that the index used by the shutdown script is matches the one used by the run script.
 
@@ -95,13 +95,13 @@ To run the CSC in fast mode, do the following.
 
 .. prompt:: bash
 
-  run_dsm.py --simulate=1 1
+  run_dsm --simulate=1 1
 
 To run the CSC is slow mode, do the following.
 
 .. prompt:: bash
 
-  run_dsm.py --simulate=2 1
+  run_dsm --simulate=2 1
 
 The above commands will put the CSC into ``STANDBY`` state.
 Use the ``--state=enabled`` flag shown above to put the CSC into ``ENABLED`` state.

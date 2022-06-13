@@ -1,9 +1,9 @@
-#!/usr/bin/env python
-
 import argparse
 import asyncio
 
 from lsst.ts import salobj
+
+__all__ = ["shutdown_dsm"]
 
 
 async def shutdown(opts):
@@ -18,12 +18,7 @@ async def shutdown(opts):
         await domain.close()
 
 
-def main(opts):
-
-    asyncio.run(shutdown(opts))
-
-
-if __name__ == "__main__":
+def shutdown_dsm():
     parser = argparse.ArgumentParser(description="Shutdown the DSM CSC.")
     parser.add_argument(
         "index",
@@ -35,4 +30,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args)
+    asyncio.run(shutdown(args))

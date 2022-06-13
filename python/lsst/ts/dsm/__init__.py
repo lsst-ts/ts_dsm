@@ -26,3 +26,4 @@ except ImportError:
 
 from .utils import *
 from .dsm_csc import *
+from .shutdown_dsm import *

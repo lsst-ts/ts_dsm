@@ -15,7 +15,7 @@ from lsst.ts import utils as tsUtils
 from . import utils
 from lsst.ts.dsm import __version__
 
-__all__ = ["DSMCSC"]
+__all__ = ["DSMCSC", "run_dsm"]
 
 SIMULATION_LOOP_TIMES = [0, 1, 30]  # seconds
 
@@ -236,3 +236,8 @@ class DSMCSC(salobj.BaseCsc):
         """Run the telemetry loop."""
         async for ioevent in self.telemetry_notifier:
             await self.process_event(ioevent)
+
+
+def run_dsm():
+    """Run the DSM CSC."""
+    asyncio.run(DSMCSC.amain(index=True))

@@ -6,7 +6,7 @@ v2.5.0
 ------
 
 * Support for new setuptool packaging
-* Runner scripts no longer need *.py extension
+* Runner scripts no longer need .py extension
 
 v2.4.0
 ------

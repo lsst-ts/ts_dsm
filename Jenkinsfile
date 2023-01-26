@@ -9,7 +9,7 @@ pipeline {
         docker {
             alwaysPull true
             image 'lsstts/develop-env:develop'
-            args "-u root --entrypoint=''"
+            args "--entrypoint=''"
         }
     }
 
@@ -36,14 +36,6 @@ pipeline {
     }
 
     post {
-        always {
-            // Change the ownership of workspace to Jenkins for the clean up
-            // This is a "work around" method
-            withEnv(["HOME=${env.WORKSPACE}"]) {
-                sh 'chown -R 1003:1003 ${HOME}/'
-            }
-        }
-
         cleanup {
             // clean up the workspace
             deleteDir()

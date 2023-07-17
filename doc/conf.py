@@ -2,8 +2,8 @@
 This configuration only affects single-package Sphinx documentation builds.
 """
 
-from documenteer.conf.pipelinespkg import *  # noqa
 import lsst.ts.dsm  # noqa
+from documenteer.conf.pipelinespkg import *  # noqa
 
 project = "ts_dsm"
 html_theme_options["logotext"] = project  # noqa

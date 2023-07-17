@@ -7,7 +7,7 @@ source:
   path: ../
 
 build:
-  noarch: generic
+  noarch: python
   script: python -m pip install --no-deps --ignore-installed .
   entry_points:
     - run_dsm = lsst.ts.dsm:run_dsm
@@ -40,12 +40,12 @@ test:
 
 requirements:
   host:
-    - python
+    - python {{ python }}
     - pip
     - setuptools_scm
     - setuptools
   run:
-    - python
+    - python {{ python }}
     - setuptools
     - setuptools_scm
     - ts-dds

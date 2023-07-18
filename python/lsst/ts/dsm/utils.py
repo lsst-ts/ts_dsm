@@ -1,10 +1,9 @@
 import csv
 import os
-import yaml
 
-from astropy.time import Time, TimeDelta
 import numpy as np
-
+import yaml
+from astropy.time import Time, TimeDelta
 from lsst.ts import utils as tsUtils
 
 __all__ = ["convert_time", "create_telemetry_config", "create_telemetry_data"]

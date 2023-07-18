@@ -24,6 +24,6 @@ try:
 except ImportError:
     __version__ = "?"
 
-from .utils import *
 from .dsm_csc import *
 from .shutdown_dsm import *
+from .utils import *

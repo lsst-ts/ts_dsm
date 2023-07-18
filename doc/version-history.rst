@@ -2,6 +2,13 @@
 Version History
 ===============
 
+v2.5.1
+------
+
+* Change to standard pre-commit configuration
+* Update conda meta.yaml for new specs
+* Fix conda package dependencies
+
 v2.5.0
 ------
 

@@ -5,15 +5,14 @@ import os
 import pathlib
 import shutil
 import tempfile
-import yaml
 
 import asyncinotify
-
+import yaml
 from lsst.ts import salobj
 from lsst.ts import utils as tsUtils
+from lsst.ts.dsm import __version__
 
 from . import utils
-from lsst.ts.dsm import __version__
 
 __all__ = ["DSMCSC", "run_dsm"]
 

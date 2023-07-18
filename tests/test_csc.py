@@ -4,9 +4,7 @@ import shutil
 import unittest
 
 import numpy as np
-
-from lsst.ts import salobj
-from lsst.ts import utils
+from lsst.ts import salobj, utils
 from lsst.ts.dsm import dsm_csc
 
 np.random.seed(47)

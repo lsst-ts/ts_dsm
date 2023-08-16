@@ -8,18 +8,10 @@ source:
 
 build:
   noarch: python
-  script: python -m pip install --no-deps --ignore-installed .
+  script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
   entry_points:
     - run_dsm = lsst.ts.dsm:run_dsm
     - shutdown_dsm = lsst.ts.dsm:shutdown_dsm
-  script_env:
-    - PATH
-    - PYTHONPATH
-    - LD_LIBRARY_PATH
-    - OSPL_HOME
-    - PYTHON_BUILD_VERSION
-    - PYTHON_BUILD_LOCATION
-    - LSST_DDS_PARTICIPANT_PREFIX
 
 test:
   requires:

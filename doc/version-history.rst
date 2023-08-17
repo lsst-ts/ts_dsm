@@ -2,6 +2,11 @@
 Version History
 ===============
 
+v2.5.2
+------
+
+* Remove script_env section and add Python generalizer to script section in conda meta.yaml
+
 v2.5.1
 ------
 

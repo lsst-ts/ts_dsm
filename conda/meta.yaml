@@ -16,7 +16,6 @@ build:
 test:
   requires:
     - ts-conda-build =0.3
-    - ts-dds
     - ts-salobj {{ salobj_version }}
     - ts-idl {{ idl_version }}
     - ts-utils
@@ -40,7 +39,6 @@ requirements:
     - python {{ python }}
     - setuptools
     - setuptools_scm
-    - ts-dds
     - ts-salobj
     - ts-utils
     - asyncinotify

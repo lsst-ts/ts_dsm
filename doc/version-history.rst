@@ -2,6 +2,11 @@
 Version History
 ===============
 
+v2.5.3
+------
+
+* Remove ts-dds from conda meta.yaml
+
 v2.5.2
 ------
 

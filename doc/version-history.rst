@@ -2,6 +2,12 @@
 Version History
 ===============
 
+v2.5.4
+------
+
+ * Update ts-conda-build pin to 0.4 in conda meta.yaml
+ * Update to latest pre-commit configuration
+
 v2.5.3
 ------
 

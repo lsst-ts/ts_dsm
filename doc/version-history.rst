@@ -2,6 +2,12 @@
 Version History
 ===============
 
+v2.5.4
+------
+
+* Remove .pre-commit-config.yaml and setup.cfg.
+* Update the version of ts-conda-build to 0.4 in the conda recipe.
+
 v2.5.3
 ------
 

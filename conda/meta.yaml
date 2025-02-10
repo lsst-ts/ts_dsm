@@ -17,7 +17,7 @@ test:
   requires:
     - ts-conda-build =0.4
     - ts-salobj {{ salobj_version }}
-    - ts-idl {{ idl_version }}
+    - ts-xml {{ xml_version }}
     - ts-utils
     - asyncinotify
     - pytz

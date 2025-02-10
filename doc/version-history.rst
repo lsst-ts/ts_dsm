@@ -2,6 +2,13 @@
 Version History
 ===============
 
+v2.6.0
+------
+
+ * Remove ts_idl conda dependency and replace with ts_xml
+ * Change deprecated test call
+ * Update unit tests for better stability
+
 v2.5.4
 ------
 

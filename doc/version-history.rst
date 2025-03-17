@@ -2,6 +2,11 @@
 Version History
 ===============
 
+v2.6.1
+------
+
+ * Fix flaky unit test
+
 v2.6.0
 ------
 

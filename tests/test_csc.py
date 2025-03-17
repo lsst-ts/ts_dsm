@@ -75,6 +75,9 @@ class TestDSMCSC(salobj.BaseCscTestCase, unittest.IsolatedAsyncioTestCase):
             self.assertTrue(os.path.exists(self.csc.telemetry_directory))
             self.telemetry_directory = self.csc.telemetry_directory
             self.assertFalse(self.csc.simulated_telemetry_loop_task.done())
+            # Now need to wait a bit to make sure the telemetry data file
+            # gets deleted
+            await asyncio.sleep(self.csc.simulation_loop_time / 10)
             # Check that one file (its the configuration file) is there as
             # the telemetry data file has been deleted
             sim_files = len(list(os.listdir(self.csc.telemetry_directory)))

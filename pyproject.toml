@@ -9,7 +9,7 @@ license = { text = "GPL3" }
 classifiers = [ "Programming Language :: Python :: 3" ]
 urls = { documentation = "https://jira.lsstcorp.org/secure/Dashboard.jspa", repository = "https://github.com/lsst-ts/ts_dsm" }
 dynamic = [ "version" ]
-dependencies = [ "asyncinotify", "pytz" ]
+dependencies = [ "asyncinotify" ]
 
 [project.scripts]
 run_dsm = "lsst.ts.dsm:run_dsm"

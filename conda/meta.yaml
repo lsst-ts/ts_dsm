@@ -20,7 +20,6 @@ test:
     - ts-xml {{ xml_version }}
     - ts-utils
     - asyncinotify
-    - pytz
   source_files:
     - bin
     - python
@@ -42,7 +41,6 @@ requirements:
     - ts-salobj
     - ts-utils
     - asyncinotify
-    - pytz
 
 about:
   home: {{ data.get('project_urls')["Source Code"] }}

@@ -125,5 +125,5 @@ Version History
 The version history of the DSM is found at the following link.
 
 .. toctree::
-    version-history
+    version_history
     :maxdepth: 1

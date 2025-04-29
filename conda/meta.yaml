@@ -1,4 +1,6 @@
 {% set data= load_setup_py_data() %}
+{% set pyproject = load_file_data('pyproject.toml') %}
+{% set project = pyproject.get('project', {}) %}
 package:
   name: "ts-dsm"
   version: {{ data.get('version') }}
@@ -43,6 +45,6 @@ requirements:
     - asyncinotify
 
 about:
-  home: {{ data.get('project_urls')["Source Code"] }}
-  license: {{ data.get('license') }}
+  home: {{ project.get('urls')["repository"] }}
+  license: {{ project.get('license')["text"] }}
   license_file: LICENSE

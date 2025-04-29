@@ -1,3 +1,12 @@
+v2.6.3 (2025-04-29)
+===================
+
+Other Changes and Additions
+---------------------------
+
+- Fixed issues with conda recipe. (`DM-49796 <https://rubinobs.atlassian.net//browse/DM-49796>`_)
+
+
 v2.6.2 (2025-04-28)
 ===================
 

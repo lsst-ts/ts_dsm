@@ -1,0 +1,1 @@
+Added local_scheme option to setup.py.
